@@ -3,16 +3,13 @@ import 'package:video_player_media_kit/video_player_media_kit.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   VideoPlayerMediaKit.ensureInitialized(
-    android:
-        true, // default: false    -    dependency: media_kit_libs_android_video
-    iOS: true, // default: false    -    dependency: media_kit_libs_ios_video
-    macOS:
-        true, // default: false    -    dependency: media_kit_libs_macos_video
-    windows:
-        true, // default: false    -    dependency: media_kit_libs_windows_video
-    linux: true, // default: false    -    dependency: media_kit_libs_linux
+    android: true,
+    iOS: true,
+    macOS: true,
+    windows: true,
+    linux: true,
   );
   runApp(const MyApp());
 }

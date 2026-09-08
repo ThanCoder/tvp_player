@@ -15,6 +15,14 @@ dependencies:
   media_kit: ^1.2.6
   video_player_media_kit: ^2.0.0
   media_kit_libs_video: ^1.0.7
+  package_info_plus: ^10.2.1
+  path_provider: ^2.1.6
+  dart_core_extensions: ^0.6.0
+  t_widgets:
+    git: https://github.com/ThanCoder/t_widgets.git
+  than_pkg_android: ^0.6.1
+  than_pkg_linux: ^0.2.0
+  cfb_store: ^0.7.0
 
 dev_dependencies:
   flutter_test:
