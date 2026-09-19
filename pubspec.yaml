@@ -1,5 +1,5 @@
 name: tvp_player
-description: "A new Flutter project."
+description: "Video Player For Free"
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
 repository: https://github.com/ThanCoder/tvp_player.git
@@ -15,27 +15,42 @@ dependencies:
   media_kit: ^1.2.6
   video_player_media_kit: ^2.0.0
   media_kit_libs_video: ^1.0.7
+  video_player: ^2.14.0
   package_info_plus: ^10.2.1
   path_provider: ^2.1.6
   dart_core_extensions: ^0.6.0
-  t_widgets:
-    git: https://github.com/ThanCoder/t_widgets.git
-  than_pkg_android: ^0.6.1
+  than_pkg_android: ^0.7.0
   than_pkg_linux: ^0.2.0
   cfb_store: ^0.7.0
+  audio_session: ^0.2.4
+  media_kit_video: ^2.0.1
+  t_widgets:
+    git: https://github.com/ThanCoder/t_widgets.git
+  t_client:
+    git: https://github.com/ThanCoder/t_client
+  t_server:
+    git: https://github.com/ThanCoder/t_server.git
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+  change_app_package_name: ^1.5.0
+  # dart run change_app_package_name:main [com.new.package.name]
+  # dart run change_app_package_name:main than.app.tvp.player
+  flutter_launcher_icons: ^0.14.4
+  # dart run flutter_launcher_icons
+  # dev lib
+flutter_launcher_icons:
+  android: "launcher_icon"
+  image_path: "assets/logo/logo1.png"
 
 flutter:
   uses-material-design: true
   # To add assets to your application, add an assets section, like this:
-  # assets:
-  #   - images/a_dot_burr.jpeg
-  #   - images/a_dot_ham.jpeg
-
+  assets:
+  - assets/
+  - assets/logo/
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
 

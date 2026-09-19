@@ -1,0 +1,673 @@
+import 'dart:async';
+import 'dart:io';
+
+import 'package:flutter/material.dart';
+import 'package:media_kit/media_kit.dart';
+import 'package:media_kit_video/media_kit_video.dart';
+import 'package:than_pkg_android/than_pkg_android.dart';
+
+import 'package:tvp_player/core/models/v_file.dart';
+
+class TvPlayerPage extends StatefulWidget {
+  const TvPlayerPage({super.key, required this.file});
+
+  final VFile file;
+
+  @override
+  State<TvPlayerPage> createState() => _TvPlayerPageState();
+}
+
+class _TvPlayerPageState extends State<TvPlayerPage> {
+  late final Player player;
+  late final VideoController controller;
+
+  Timer? _hideTimer;
+
+  bool _showControls = true;
+
+  @override
+  void initState() {
+    super.initState();
+    if (Platform.isAndroid) {
+      ThanPkgAndroid.getInstance.flutterUtils.toggleFullscreen(true);
+    }
+
+    player = Player();
+    controller = VideoController(player);
+
+    player.open(Media(widget.file.path));
+
+    _startHideTimer();
+  }
+
+  @override
+  void dispose() {
+    if (Platform.isAndroid) {
+      ThanPkgAndroid.getInstance.flutterUtils.toggleFullscreen(false);
+      ThanPkgAndroid.getInstance.orientationHandler.setOrientation(
+        .SCREEN_ORIENTATION_PORTRAIT,
+      );
+    }
+    _hideTimer?.cancel();
+    player.dispose();
+
+    super.dispose();
+  }
+
+  // ===========================================================================
+  // Controls
+  // ===========================================================================
+
+  void _toggleControls() {
+    setState(() {
+      _showControls = !_showControls;
+    });
+
+    if (_showControls) {
+      _startHideTimer();
+    } else {
+      _hideTimer?.cancel();
+    }
+  }
+
+  void _startHideTimer() {
+    _hideTimer?.cancel();
+
+    _hideTimer = Timer(const Duration(seconds: 3), () {
+      if (!mounted) return;
+
+      setState(() {
+        _showControls = false;
+      });
+    });
+  }
+
+  Future<void> _togglePlay() async {
+    await player.playOrPause();
+    _startHideTimer();
+  }
+
+  Future<void> _seekRelative(Duration offset) async {
+    final position = player.state.position;
+    final duration = player.state.duration;
+
+    var target = position + offset;
+
+    if (target < Duration.zero) {
+      target = Duration.zero;
+    }
+
+    if (target > duration) {
+      target = duration;
+    }
+
+    await player.seek(target);
+
+    _startHideTimer();
+  }
+
+  // ===========================================================================
+  // Build
+  // ===========================================================================
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: SafeArea(
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            // =================================================================
+            // VIDEO
+            // =================================================================
+
+            Video(controller: controller, controls: NoVideoControls),
+
+            // =================================================================
+            // TOUCH AREA
+            // =================================================================
+            GestureDetector(
+              behavior: HitTestBehavior.translucent,
+
+              onTap: _toggleControls,
+
+              onDoubleTapDown: (details) {
+                final width = MediaQuery.sizeOf(context).width;
+
+                if (details.localPosition.dx < width / 2) {
+                  _seekRelative(const Duration(seconds: -10));
+                } else {
+                  _seekRelative(const Duration(seconds: 10));
+                }
+              },
+
+              child: const SizedBox.expand(),
+            ),
+
+            // =================================================================
+            // CUSTOM CONTROLS
+            // =================================================================
+            IgnorePointer(
+              ignoring: !_showControls,
+              child: AnimatedOpacity(
+                opacity: _showControls ? 1 : 0,
+                duration: const Duration(milliseconds: 180),
+                child: _Controls(
+                  file: widget.file,
+                  player: player,
+                  onBack: () {
+                    Navigator.of(context).pop();
+                  },
+                  onPlayPause: _togglePlay,
+                  onSeekBack: () {
+                    _seekRelative(const Duration(seconds: -10));
+                  },
+                  onSeekForward: () {
+                    _seekRelative(const Duration(seconds: 10));
+                  },
+                  onInteraction: _startHideTimer,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// =============================================================================
+// CONTROLS
+// =============================================================================
+
+class _Controls extends StatelessWidget {
+  const _Controls({
+    required this.file,
+    required this.player,
+    required this.onBack,
+    required this.onPlayPause,
+    required this.onSeekBack,
+    required this.onSeekForward,
+    required this.onInteraction,
+  });
+
+  final VFile file;
+  final Player player;
+
+  final VoidCallback onBack;
+  final VoidCallback onPlayPause;
+  final VoidCallback onSeekBack;
+  final VoidCallback onSeekForward;
+  final VoidCallback onInteraction;
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        // =====================================================================
+        // TOP BAR
+        // =====================================================================
+
+        Align(
+          alignment: Alignment.topCenter,
+          child: Container(
+            height: 80,
+            padding: const EdgeInsets.only(left: 4, right: 4, top: 4),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.black.withValues(alpha: .90),
+                  Colors.transparent,
+                ],
+              ),
+            ),
+            child: Row(
+              children: [
+                IconButton(
+                  onPressed: onBack,
+                  icon: const Icon(Icons.arrow_back, color: Colors.white),
+                ),
+
+                Expanded(
+                  child: Text(
+                    file.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+
+                IconButton(
+                  onPressed: () {
+                    _showMoreMenu(context);
+                  },
+                  icon: const Icon(Icons.more_vert, color: Colors.white),
+                ),
+              ],
+            ),
+          ),
+        ),
+
+        // =====================================================================
+        // CENTER CONTROLS
+        // =====================================================================
+        Center(
+          child: StreamBuilder<bool>(
+            stream: player.stream.playing,
+            builder: (context, snapshot) {
+              final playing = snapshot.data ?? false;
+
+              return Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _CircleButton(icon: Icons.replay_10, onPressed: onSeekBack),
+
+                  const SizedBox(width: 30),
+
+                  _PlayButton(playing: playing, onPressed: onPlayPause),
+
+                  const SizedBox(width: 30),
+
+                  _CircleButton(
+                    icon: Icons.forward_10,
+                    onPressed: onSeekForward,
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
+
+        // =====================================================================
+        // BOTTOM BAR
+        // =====================================================================
+        Align(
+          alignment: Alignment.bottomCenter,
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(12, 32, 12, 8),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.bottomCenter,
+                end: Alignment.topCenter,
+                colors: [
+                  Colors.black.withValues(alpha: .92),
+                  Colors.transparent,
+                ],
+              ),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // --------------------------------------------------------------
+                // SEEK BAR
+                // --------------------------------------------------------------
+
+                StreamBuilder<Duration>(
+                  stream: player.stream.position,
+                  builder: (context, positionSnapshot) {
+                    final position = positionSnapshot.data ?? Duration.zero;
+
+                    return StreamBuilder<Duration>(
+                      stream: player.stream.duration,
+                      builder: (context, durationSnapshot) {
+                        final duration = durationSnapshot.data ?? Duration.zero;
+
+                        return SliderTheme(
+                          data: SliderTheme.of(context).copyWith(
+                            trackHeight: 3,
+                            thumbShape: const RoundSliderThumbShape(
+                              enabledThumbRadius: 6,
+                            ),
+                            overlayShape: const RoundSliderOverlayShape(
+                              overlayRadius: 14,
+                            ),
+                          ),
+                          child: Slider(
+                            min: 0,
+                            max: duration.inMilliseconds > 0
+                                ? duration.inMilliseconds.toDouble()
+                                : 1,
+                            value: position.inMilliseconds
+                                .clamp(
+                                  0,
+                                  duration.inMilliseconds > 0
+                                      ? duration.inMilliseconds
+                                      : 1,
+                                )
+                                .toDouble(),
+                            onChanged: duration.inMilliseconds <= 0
+                                ? null
+                                : (value) {
+                                    player.seek(
+                                      Duration(milliseconds: value.toInt()),
+                                    );
+
+                                    onInteraction();
+                                  },
+                          ),
+                        );
+                      },
+                    );
+                  },
+                ),
+
+                // --------------------------------------------------------------
+                // TIME + ACTIONS
+                // --------------------------------------------------------------
+                StreamBuilder<Duration>(
+                  stream: player.stream.position,
+                  builder: (context, positionSnapshot) {
+                    final position = positionSnapshot.data ?? Duration.zero;
+
+                    return StreamBuilder<Duration>(
+                      stream: player.stream.duration,
+                      builder: (context, durationSnapshot) {
+                        final duration = durationSnapshot.data ?? Duration.zero;
+
+                        return Row(
+                          children: [
+                            Text(
+                              _formatDuration(position),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                              ),
+                            ),
+
+                            const Text(
+                              ' / ',
+                              style: TextStyle(
+                                color: Colors.white54,
+                                fontSize: 12,
+                              ),
+                            ),
+
+                            Text(
+                              _formatDuration(duration),
+                              style: const TextStyle(
+                                color: Colors.white70,
+                                fontSize: 12,
+                              ),
+                            ),
+
+                            const Spacer(),
+
+                            // Speed
+                            IconButton(
+                              onPressed: () {
+                                _showSpeedMenu(context);
+                              },
+                              icon: const Icon(
+                                Icons.speed,
+                                color: Colors.white,
+                              ),
+                            ),
+
+                            // Subtitle
+                            IconButton(
+                              onPressed: () {
+                                _showSubtitleMenu(context);
+                              },
+                              icon: const Icon(
+                                Icons.subtitles_outlined,
+                                color: Colors.white,
+                              ),
+                            ),
+
+                            // Fullscreen
+                            IconButton(
+                              onPressed: () {
+                                // SystemChrome.setEnabledSystemUIMode(...)
+                                if (Platform.isAndroid) {
+                                  ThanPkgAndroid.getInstance.orientationHandler
+                                      .setOrientation(
+                                        .SCREEN_ORIENTATION_SENSOR_LANDSCAPE,
+                                      );
+                                }
+                              },
+                              icon: const Icon(
+                                Icons.fullscreen,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // ===========================================================================
+  // MORE MENU
+  // ===========================================================================
+
+  void _showMoreMenu(BuildContext context) {
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return _BottomMenu(
+          children: [
+            ListTile(
+              leading: const Icon(Icons.info_outline),
+              title: const Text('Video information'),
+              onTap: () {
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.repeat),
+              title: const Text('Repeat'),
+              onTap: () {
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.lock_outline),
+              title: const Text('Lock controls'),
+              onTap: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // ===========================================================================
+  // SPEED
+  // ===========================================================================
+
+  void _showSpeedMenu(BuildContext context) {
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return _BottomMenu(
+          title: 'Playback speed',
+          children: [
+            for (final speed in [0.5, 0.75, 1.0, 1.25, 1.5, 2.0])
+              ListTile(
+                title: Text('${speed}x'),
+                trailing: player.state.rate == speed
+                    ? const Icon(Icons.check)
+                    : null,
+                onTap: () {
+                  player.setRate(speed);
+                  Navigator.pop(context);
+                },
+              ),
+          ],
+        );
+      },
+    );
+  }
+
+  // ===========================================================================
+  // SUBTITLE
+  // ===========================================================================
+
+  void _showSubtitleMenu(BuildContext context) {
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return _BottomMenu(
+          title: 'Subtitle',
+          children: [
+            ListTile(
+              leading: const Icon(Icons.subtitles),
+              title: const Text('Off'),
+              onTap: () {
+                // media_kit subtitle track selection
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.subtitles),
+              title: const Text('Select subtitle track'),
+              onTap: () {
+                // media_kit subtitle track selection
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+// =============================================================================
+// PLAY BUTTON
+// =============================================================================
+
+class _PlayButton extends StatelessWidget {
+  const _PlayButton({required this.playing, required this.onPressed});
+
+  final bool playing;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.white.withValues(alpha: .18),
+      shape: const CircleBorder(),
+      child: InkWell(
+        customBorder: const CircleBorder(),
+        onTap: onPressed,
+        child: SizedBox(
+          width: 72,
+          height: 72,
+          child: Icon(
+            playing ? Icons.pause : Icons.play_arrow,
+            color: Colors.white,
+            size: 42,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// =============================================================================
+// CIRCLE BUTTON
+// =============================================================================
+
+class _CircleButton extends StatelessWidget {
+  const _CircleButton({required this.icon, required this.onPressed});
+
+  final IconData icon;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.black.withValues(alpha: .28),
+      shape: const CircleBorder(),
+      child: InkWell(
+        customBorder: const CircleBorder(),
+        onTap: onPressed,
+        child: SizedBox(
+          width: 52,
+          height: 52,
+          child: Icon(icon, color: Colors.white, size: 30),
+        ),
+      ),
+    );
+  }
+}
+
+// =============================================================================
+// BOTTOM MENU
+// =============================================================================
+
+class _BottomMenu extends StatelessWidget {
+  const _BottomMenu({this.title, required this.children});
+
+  final String? title;
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.only(top: 12, bottom: 20),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      child: SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (title != null) ...[
+              Text(
+                title!,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 8),
+            ],
+            ...children,
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// =============================================================================
+// FORMAT
+// =============================================================================
+
+String _formatDuration(Duration duration) {
+  final hours = duration.inHours;
+  final minutes = duration.inMinutes.remainder(60);
+  final seconds = duration.inSeconds.remainder(60);
+
+  if (hours > 0) {
+    return '$hours:'
+        '${minutes.toString().padLeft(2, '0')}:'
+        '${seconds.toString().padLeft(2, '0')}';
+  }
+
+  return '$minutes:'
+      '${seconds.toString().padLeft(2, '0')}';
+}
