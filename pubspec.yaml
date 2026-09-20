@@ -30,8 +30,9 @@ dependencies:
     git: https://github.com/ThanCoder/t_client
   t_server:
     git: https://github.com/ThanCoder/t_server.git
-  than_media_tag:
-    git: https://github.com/ThanCoder/than_media_tag.git
+  uuid: ^4.6.0
+  # than_media_tag:
+  #   git: https://github.com/ThanCoder/than_media_tag.git
 
 dev_dependencies:
   flutter_test:

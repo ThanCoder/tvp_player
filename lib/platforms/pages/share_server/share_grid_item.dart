@@ -33,10 +33,7 @@ class ShareGridItem extends StatelessWidget {
                   'http://$host/api/thumbnail/${file.id}',
                   fit: .cover,
                   errorBuilder: (context, error, stackTrace) => Center(
-                    child: Text(
-                      'Error: $error',
-                      style: TextStyle(color: Colors.red, fontSize: 12),
-                    ),
+                    child: Icon(Icons.image_not_supported_outlined, size: 80),
                   ),
                 ),
               ),

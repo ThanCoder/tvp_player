@@ -3,12 +3,11 @@ import 'dart:isolate';
 
 import 'package:dart_core_extensions/dart_core_extensions.dart';
 import 'package:flutter/foundation.dart';
-import 'package:than_media_tag/core/av_format.dart';
-import 'package:than_media_tag/models/media_info.dart';
 import 'package:than_pkg_android/than_pkg_android.dart';
 import 'package:than_pkg_linux/than_pkg_linux.dart';
 import 'package:tvp_player/core/models/v_file.dart';
 import 'package:tvp_player/keys.dart';
+import 'package:uuid/v4.dart';
 
 class PlatformUtil {
   static Future<void> launchUrl(String url) async {
@@ -75,22 +74,22 @@ class PlatformUtil {
               Duration dur = .new();
               bool thumbnailExists = false;
 
-              final fmt = AvFormat();
-              final fmtRes = fmt.open(f.path);
-              if (fmtRes.isErr) {
-                continue;
-              }
-              fmt.loadInfo();
-              for (var stm in fmt.infoList) {
-                if (stm is VideoStreamInfo) {
-                  dur = stm.duration;
-                  thumbnailExists = true;
-                }
-              }
+              // final fmt = AvFormat();
+              // final fmtRes = fmt.open(f.path);
+              // if (fmtRes.isErr) {
+              //   continue;
+              // }
+              // fmt.loadInfo();
+              // for (var stm in fmt.infoList) {
+              //   if (stm is VideoStreamInfo) {
+              //     dur = stm.duration;
+              //     thumbnailExists = true;
+              //   }
+              // }
 
               files.add(
                 .new(
-                  id: f.path,
+                  id: UuidV4().generate(),
                   name: f.name,
                   size: f.size,
                   path: f.path,
@@ -100,9 +99,9 @@ class PlatformUtil {
                   thumbnailExists: thumbnailExists,
                 ),
               );
-              if (fmtRes.isOk) {
-                fmt.close();
-              }
+              // if (fmtRes.isOk) {
+              //   fmt.close();
+              // }
             }
             if (f is Directory) {
               scanFolder.add(f.directory);

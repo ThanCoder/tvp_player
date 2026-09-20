@@ -98,23 +98,23 @@ class _ReceivePageState extends State<ReceivePage> {
   }
 
   void download(VFile file) async {
+    final hostUrl = 'http://$_connectAddress';
     final downloadF = await showModalBottomSheet<VFile>(
       context: context,
       showDragHandle: true,
       isScrollControlled: true,
-      builder: (context) => ShareDownloadMenu(file: file),
+      builder: (context) => ShareDownloadMenu(file: file, host: hostUrl),
     );
     if (downloadF == null) return;
     if (!mounted) return;
 
-    final hostUr = 'http://$_connectAddress';
     final outPath = await PlatformUtil.getOutPath(file.name);
     if (!mounted) return;
     await showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) =>
-          ShareDownloaderDialog(hostUr: hostUr, file: file, outPath: outPath),
+          ShareDownloaderDialog(hostUrl: hostUrl, file: file, outPath: outPath),
     );
   }
 

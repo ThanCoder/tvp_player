@@ -6,11 +6,11 @@ import 'package:tvp_player/core/models/v_file.dart';
 class ShareDownloaderDialog extends StatefulWidget {
   const new({
     super.key,
-    required this.hostUr,
+    required this.hostUrl,
     required this.file,
     required this.outPath,
   });
-  final String hostUr;
+  final String hostUrl;
   final VFile file;
   final String outPath;
 
@@ -44,7 +44,7 @@ class _ShareDownloaderDialogState extends State<ShareDownloaderDialog> {
       error = null;
       isDownloading = true;
     });
-    final url = '${widget.hostUr}/api/video/${widget.file.id}';
+    final url = '${widget.hostUrl}/api/video/${widget.file.id}';
     final res = await client.downloadProgress(
       url,
       widget.outPath,

@@ -7,8 +7,9 @@ import 'package:tvp_player/core/util/app_util.dart';
 import 'package:tvp_player/keys.dart';
 
 class VfPlayerDesktopPage extends StatefulWidget {
-  const new({super.key, required this.file});
+  const new({super.key, required this.file, this.host});
   final VFile file;
+  final String? host;
 
   @override
   State<VfPlayerDesktopPage> createState() => _VfPlayerDesktopPageState();
@@ -28,7 +29,13 @@ class _VfPlayerDesktopPageState extends State<VfPlayerDesktopPage> {
   Future<void> init() async {
     final lastPos = config.getInt('$tvPlayerLastPosKey-${widget.file.id}');
 
-    await player.open(Media(widget.file.path), play: lastPos == 0);
+    if (widget.host != null) {
+      final url = '${widget.host}/api/video/stream/${widget.file.id}';
+      // print(url);
+      await player.open(Media(url, start: .zero, end: widget.file.duration));
+    } else {
+      await player.open(Media(widget.file.path), play: lastPos == 0);
+    }
     await controller.waitUntilFirstFrameRendered;
 
     if (lastPos > 0) {

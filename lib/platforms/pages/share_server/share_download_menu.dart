@@ -2,12 +2,14 @@ import 'package:dart_core_extensions/dart_core_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:t_widgets/t_widgets.dart';
 import 'package:tvp_player/core/models/v_file.dart';
+import 'package:tvp_player/routers.dart';
 
 import 'menu_item.dart';
 
 class ShareDownloadMenu extends StatelessWidget {
-  const new({super.key, required this.file});
+  const new({super.key, required this.file, required this.host});
   final VFile file;
+  final String host;
 
   @override
   Widget build(BuildContext context) {
@@ -17,6 +19,13 @@ class ShareDownloadMenu extends StatelessWidget {
       child: Column(
         children: [
           MenuItem(title: file.name, leadingIcon: Icons.title_outlined),
+          InkWell(
+            onTap: () {
+              context.pop();
+              goVfPlayer(context, file, host: host);
+            },
+            child: MenuItem(title: 'Play', leadingIcon: Icons.play_arrow),
+          ),
 
           MenuItem(title: file.id, leadingIcon: Icons.fingerprint_outlined),
           MenuItem(

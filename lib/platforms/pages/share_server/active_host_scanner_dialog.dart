@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:t_client/t_client.dart';
 import 'package:t_widgets/t_widgets.dart';
 import 'package:tvp_player/platforms/pages/share_server/share_controller.dart';
@@ -116,23 +117,27 @@ class _ActiveHostScannerDialogState extends State<ActiveHostScannerDialog> {
                               onTap: () {
                                 context.pop<String>(e);
                               },
+                              onLongPress: () async {
+                                await Clipboard.setData(.new(text: e));
+                              },
                             );
                           }),
                         ],
                       ),
               ),
         actions: [
-          if (!isLoading)
-            FilledButton(
-              style: FilledButton.styleFrom(
-                backgroundColor: col.error,
-                foregroundColor: col.onError,
-              ),
-              onPressed: () {
-                context.pop();
-              },
-              child: Text('Close'),
+          FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: col.error,
+              foregroundColor: col.onError,
             ),
+            onPressed: isLoading
+                ? null
+                : () {
+                    context.pop();
+                  },
+            child: Text('Close'),
+          ),
         ],
       ),
     );

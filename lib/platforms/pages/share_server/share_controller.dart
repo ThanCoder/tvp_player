@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dart_core_extensions/dart_core_extensions.dart';
+import 'package:flutter/services.dart';
 import 'package:t_server/t_server.dart';
 import 'package:tvp_player/core/controllers/i_controller.dart';
 import 'package:tvp_player/core/controllers/v_file_controller.dart';
@@ -17,6 +18,7 @@ class ShareController {
   final _router = THttpRouter();
   VFileController get _allCon => ControllerManager.read<VFileController>();
   int port = 7000;
+  Uint8List? _logoBytes;
 
   Future<void> init() async {
     _router.clearRoutes();
@@ -25,7 +27,8 @@ class ShareController {
         'message': 'TVP Player Api Server',
         '/api': 'video file list',
         '/api/thumbnail/:id': 'cover data',
-        '/api/video/:id': 'book data && download data',
+        '/api/video/:id': 'video data && download data',
+        '/api/video/stream/:id': 'video stream',
       });
     });
     _router.get('/api', (ctx) async {
@@ -53,6 +56,17 @@ class ShareController {
       if (!coverFile.existsSync()) {
         await PlatformUtil.genThumbnail(item, coverFile);
       }
+      if (!coverFile.existsSync()) {
+        if (_logoBytes == null) {
+          final byteData = await rootBundle.load('assets/logo/logo1.png');
+          _logoBytes = byteData.buffer.asUint8List();
+        }
+        await ctx.response.send(
+          _logoBytes,
+          contentType: ContentType('image', 'png'),
+        );
+        return;
+      }
 
       await ctx.response.download(coverFile);
     });
@@ -74,6 +88,24 @@ class ShareController {
       final itemFile = File(item.path);
 
       await ctx.response.download(itemFile);
+    });
+    _router.get('/api/video/stream/:id', (ctx) async {
+      final id = ctx.params['id'];
+      if (id == null) {
+        await ctx.response.json({'message': 'id not found!', 'success': false});
+        return;
+      }
+      final item = _allCon.getById(id);
+      if (item == null) {
+        await ctx.response.json({
+          'message': 'video not found!',
+          'success': false,
+        });
+        return;
+      }
+      final itemFile = File(item.path);
+
+      await ctx.response.videoStream(itemFile, contentType: .mp4);
     });
     server.setRouter(_router);
   }
