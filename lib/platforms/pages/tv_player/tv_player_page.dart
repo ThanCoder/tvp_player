@@ -16,8 +16,7 @@ import 'package:tvp_player/platforms/pages/tv_player/tv_gesture_indicator.dart';
 import 'package:tvp_player/platforms/pages/tv_player/tv_player_controls.dart';
 
 class TvPlayerPage extends StatefulWidget {
-  const TvPlayerPage({super.key, required this.file});
-
+  const new({super.key, required this.file});
   final VFile file;
 
   @override
@@ -55,6 +54,32 @@ class _TvPlayerPageState extends State<TvPlayerPage> {
     }
     super.initState();
     init();
+  }
+  // ---------------------------------------------------------------------------
+  // Dispose
+  // ---------------------------------------------------------------------------
+
+  @override
+  void dispose() {
+    _hideTimer?.cancel();
+    _gestureTimer?.cancel();
+    if (Platform.isAndroid) {
+      ThanPkgAndroid.getInstance.flutterUtils.toggleFullscreen(false);
+      ThanPkgAndroid.getInstance.brightnessHandler.restoreScreenBrightness();
+    }
+    _exitLandscape();
+    if (player.state.position.inSeconds < player.state.duration.inSeconds) {
+      config.putAndWriteAll(
+        '$tvPlayerLastPosKey-${widget.file.id}',
+        player.state.position.inSeconds,
+      );
+    }
+    _bluetoothSession?.cancel();
+    _headphonesSession?.cancel();
+
+    player.dispose();
+
+    super.dispose();
   }
 
   StreamSubscription? _headphonesSession;
@@ -139,33 +164,6 @@ class _TvPlayerPageState extends State<TvPlayerPage> {
         .SCREEN_ORIENTATION_PORTRAIT,
       );
     }
-  }
-
-  // ---------------------------------------------------------------------------
-  // Dispose
-  // ---------------------------------------------------------------------------
-
-  @override
-  void dispose() {
-    _hideTimer?.cancel();
-    _gestureTimer?.cancel();
-    if (Platform.isAndroid) {
-      ThanPkgAndroid.getInstance.flutterUtils.toggleFullscreen(false);
-      ThanPkgAndroid.getInstance.brightnessHandler.restoreScreenBrightness();
-    }
-    _exitLandscape();
-    if (player.state.position.inSeconds < player.state.duration.inSeconds) {
-      config.putAndWriteAll(
-        '$tvPlayerLastPosKey-${widget.file.id}',
-        player.state.position.inSeconds,
-      );
-    }
-    _bluetoothSession?.cancel();
-    _headphonesSession?.cancel();
-
-    player.dispose();
-
-    super.dispose();
   }
 
   // ===========================================================================

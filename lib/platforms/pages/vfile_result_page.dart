@@ -38,7 +38,14 @@ class _VfileResultPageState extends State<VfileResultPage> {
     });
   }
 
-  void deleteMulti() {}
+  void deleteMulti() async {
+    final success = await showVFileDeleteMulti(context, paths);
+    if (!success) return;
+    paths.clear();
+    setState(() {
+      selectEnable = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

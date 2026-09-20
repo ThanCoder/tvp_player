@@ -101,10 +101,10 @@ class VFileController extends IController {
     }
   }
 
-  Future<void> deleteMulti(List<VFile> delFiles) async {
+  Future<void> deleteMulti(List<String> paths) async {
     try {
-      for (var f in delFiles) {
-        await File(f.path).deleteSafe();
+      for (var path in paths) {
+        await File(path).deleteSafe();
       }
       await loadFiles();
     } catch (e) {

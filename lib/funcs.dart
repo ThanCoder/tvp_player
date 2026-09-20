@@ -72,10 +72,26 @@ Future<void> showVFileDelete(BuildContext context, VFile file) async {
   );
   if (!conf) return;
   final con = ControllerManager.read<VFileController>();
-  await con.deleteMulti([file]);
+  await con.deleteMulti([file.path]);
 }
 
-Future<void> showVFileDeleteMulti(
+Future<bool> showVFileDeleteMulti(
   BuildContext context,
-  List<VFile> files,
-) async {}
+  List<String> paths,
+) async {
+  final col = Theme.of(context).colorScheme;
+
+  final conf = await showConfirmDialog(
+    context,
+    'Want To Delete?\n${paths.map((e) => '`${e.getName()}`').join(',')}',
+    title: 'Delete!',
+    closeText: 'No',
+    confirmText: 'Delete Forever!',
+    confirmColor: col.error,
+    confirmForegroundColor: col.onError,
+  );
+  if (!conf) return false;
+  final con = ControllerManager.read<VFileController>();
+  await con.deleteMulti(paths);
+  return true;
+}

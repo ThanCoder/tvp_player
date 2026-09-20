@@ -43,6 +43,8 @@ class _ReceivePageState extends State<ReceivePage> {
   List<VFile> files = [];
   List<VFile> result = [];
 
+  TSortItem sortItem = .dateTSortItem;
+
   Future<void> init() async {
     try {
       _connectAddress ??= await showDialog<String>(
@@ -95,6 +97,27 @@ class _ReceivePageState extends State<ReceivePage> {
     }
   }
 
+  void download(VFile file) async {
+    final downloadF = await showModalBottomSheet<VFile>(
+      context: context,
+      showDragHandle: true,
+      isScrollControlled: true,
+      builder: (context) => ShareDownloadMenu(file: file),
+    );
+    if (downloadF == null) return;
+    if (!mounted) return;
+
+    final hostUr = 'http://$_connectAddress';
+    final outPath = await PlatformUtil.getOutPath(file.name);
+    if (!mounted) return;
+    await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) =>
+          ShareDownloaderDialog(hostUr: hostUr, file: file, outPath: outPath),
+    );
+  }
+
   bool isSearch = false;
   final controller = TextEditingController();
   final focusNode = FocusNode();
@@ -111,17 +134,25 @@ class _ReceivePageState extends State<ReceivePage> {
     setState(() {});
   }
 
+  void onSortChanged(TSortItem val) {
+    sortItem = val;
+    if (sortItem.id == TSortItem.dateTSortItem.id) {
+      files.sortData(newest: sortItem.isTrue);
+    }
+    if (sortItem.id == TSortItem.nameTSortItem.id) {
+      files.sortName(aToZ: sortItem.isTrue);
+    }
+    if (sortItem.id == TSortItem.sizeTSortItem.id) {
+      files.sortSize(smallToBig: sortItem.isTrue);
+    }
+    setState(() {});
+  }
+
   ColorScheme get col => Theme.of(context).colorScheme;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Receive Page'),
-        actions: [
-          if (TPlatform.isDesktop && !isLoading)
-            IconButton(onPressed: init, icon: Icon(Icons.refresh_outlined)),
-        ],
-      ),
+      appBar: _appbar(),
       body: RefreshIndicator.adaptive(
         onRefresh: init,
         child: isLoading
@@ -140,6 +171,22 @@ class _ReceivePageState extends State<ReceivePage> {
                 ],
               ),
       ),
+    );
+  }
+
+  AppBar _appbar() {
+    return AppBar(
+      title: Text('Receive Page'),
+      actions: [
+        if (TPlatform.isDesktop && !isLoading)
+          IconButton(onPressed: init, icon: Icon(Icons.refresh_outlined)),
+        TSortProviderButton(
+          value: sortItem,
+          list: [.dateTSortItem, .nameTSortItem, .sizeTSortItem],
+          onApply: onSortChanged,
+        ),
+        SizedBox(width: 10),
+      ],
     );
   }
 
@@ -205,10 +252,10 @@ class _ReceivePageState extends State<ReceivePage> {
     }
     return SliverGrid.builder(
       gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-        maxCrossAxisExtent: 220,
-        childAspectRatio: .68,
-        crossAxisSpacing: 2,
-        mainAxisSpacing: 2,
+        maxCrossAxisExtent: 240,
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 16,
+        childAspectRatio: 240 / 210,
       ),
       itemCount: list.length,
       itemBuilder: (context, index) {
@@ -219,27 +266,6 @@ class _ReceivePageState extends State<ReceivePage> {
           onClicked: download,
         );
       },
-    );
-  }
-
-  void download(VFile file) async {
-    final downloadF = await showModalBottomSheet<VFile>(
-      context: context,
-      showDragHandle: true,
-      isScrollControlled: true,
-      builder: (context) => ShareDownloadMenu(file: file),
-    );
-    if (downloadF == null) return;
-    if (!mounted) return;
-
-    final hostUr = 'http://$_connectAddress';
-    final outPath = await PlatformUtil.getOutPath(file.name);
-    if (!mounted) return;
-    await showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) =>
-          ShareDownloaderDialog(hostUr: hostUr, file: file, outPath: outPath),
     );
   }
 }

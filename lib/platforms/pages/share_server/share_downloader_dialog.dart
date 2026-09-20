@@ -33,18 +33,22 @@ class _ShareDownloaderDialogState extends State<ShareDownloaderDialog> {
 
   final client = TClient();
   bool isLoading = false;
+  bool isDownloading = false;
   double? progress;
   String? error;
+  DownloadToken token = .new(onCancelFileDelete: true);
 
   void init() async {
     setState(() {
       progress = null;
       error = null;
+      isDownloading = true;
     });
     final url = '${widget.hostUr}/api/video/${widget.file.id}';
     final res = await client.downloadProgress(
       url,
       widget.outPath,
+      token: token,
       onProgress: (progress) {
         if (!mounted) return;
         setState(() {
@@ -52,19 +56,21 @@ class _ShareDownloaderDialogState extends State<ShareDownloaderDialog> {
         });
       },
     );
-    if (!mounted) return;
+    isDownloading = false;
     if (res.isErr) {
-      setState(() {
-        error = res.unwrapError();
-      });
+      error = res.unwrapError();
+      if (!mounted) return;
+      setState(() {});
       return;
     }
+    if (!mounted) return;
+    setState(() {});
   }
+
+  ColorScheme get col => Theme.of(context).colorScheme;
 
   @override
   Widget build(BuildContext context) {
-    final col = Theme.of(context).colorScheme;
-
     return AlertDialog.adaptive(
       scrollable: true,
       content: Center(
@@ -100,14 +106,22 @@ class _ShareDownloaderDialogState extends State<ShareDownloaderDialog> {
                 ],
               ),
       ),
-      actions: [
-        FilledButton(
-          onPressed: () {
-            context.pop();
-          },
-          child: Text('Close'),
-        ),
-      ],
+      actions: _actions,
     );
+  }
+
+  List<Widget> get _actions {
+    return [
+      FilledButton(
+        onPressed: () {
+          if (isDownloading) {
+            token.cance();
+            return;
+          }
+          context.pop();
+        },
+        child: Text(isDownloading ? 'Cancel' : 'Close'),
+      ),
+    ];
   }
 }

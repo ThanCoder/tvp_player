@@ -2,8 +2,10 @@ import 'dart:io';
 
 import 'package:cfb_store/cfb_store.dart';
 import 'package:dart_core_extensions/dart_core_extensions.dart';
+import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:than_pkg_linux/than_pkg_linux.dart';
 
 class AppUtil {
   static final AppUtil instance = AppUtil._();
@@ -16,6 +18,7 @@ class AppUtil {
   late final String version;
   late Directory _cacheDir;
   late Directory _configDir;
+  final isMobileNotifier = ValueNotifier<bool>(true);
 
   Future<void> init() async {
     final info = await PackageInfo.fromPlatform();
@@ -24,7 +27,13 @@ class AppUtil {
     version = info.version;
 
     _cacheDir = await getApplicationCacheDirectory();
-    _configDir = (await getExternalStorageDirectory())!;
+    if (Platform.isLinux) {
+      _configDir = (await ThanPkgLinux.getInstance.pathHandler
+          .getApplicationConfigDirectory())!;
+    }
+    if (Platform.isAndroid) {
+      _configDir = (await getExternalStorageDirectory())!;
+    }
 
     await config.open(_configDir.join('app.config.cfb'));
   }

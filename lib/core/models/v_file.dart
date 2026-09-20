@@ -10,6 +10,7 @@ class VFile {
     required this.duration,
     required this.dateAdded,
     required this.dateModified,
+    required this.thumbnailExists,
   });
   final String id;
   final String name;
@@ -18,6 +19,7 @@ class VFile {
   final Duration duration;
   final DateTime dateAdded;
   final DateTime dateModified;
+  final bool thumbnailExists;
 
   VFile copyWith({
     String? id,
@@ -27,6 +29,7 @@ class VFile {
     Duration? duration,
     DateTime? dateAdded,
     DateTime? dateModified,
+    bool? thumbnailExists,
   }) {
     return VFile(
       id: id ?? this.id,
@@ -36,6 +39,7 @@ class VFile {
       duration: duration ?? this.duration,
       dateAdded: dateAdded ?? this.dateAdded,
       dateModified: dateModified ?? this.dateModified,
+      thumbnailExists: thumbnailExists ?? this.thumbnailExists,
     );
   }
 
@@ -48,6 +52,7 @@ class VFile {
       'duration': duration.inMilliseconds,
       'dateAdded': dateAdded.millisecondsSinceEpoch,
       'dateModified': dateModified.millisecondsSinceEpoch,
+      'thumbnailExists': thumbnailExists,
     };
   }
 
@@ -62,6 +67,7 @@ class VFile {
       dateModified: DateTime.fromMillisecondsSinceEpoch(
         map['dateModified'] as int,
       ),
+      thumbnailExists: map.getBool(['thumbnailExists']),
     );
   }
 }

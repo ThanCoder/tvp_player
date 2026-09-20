@@ -3,7 +3,9 @@ import 'dart:io';
 import 'package:dart_core_extensions/dart_core_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:t_widgets/t_widgets.dart';
+import 'package:tvp_player/core/util/app_util.dart';
 import 'package:tvp_player/platforms/components/dialog/error_alert_dialog.dart';
+import 'package:tvp_player/platforms/components/dialog/prompt_alert_dialog.dart';
 
 class FileExp extends StatefulWidget {
   const new({super.key, required this.rootDir});
@@ -40,6 +42,13 @@ class _FileExpState extends State<FileExp> {
         }
         setState(() {});
       }
+      files.sort((a, b) => a.name.compareTo(b.name));
+
+      files.sort((a, b) {
+        if (a is Directory && b is File) return -1;
+        if (b is Directory && a is File) return 1;
+        return 0;
+      });
     } catch (e) {
       showErrorDialog(context, e.toString());
     }
@@ -49,6 +58,32 @@ class _FileExpState extends State<FileExp> {
     if (file is! Directory) return;
     dir = file.directory;
     scan();
+  }
+
+  void createFolder() async {
+    final name = await showPromptAlertDialog(
+      context,
+      'New Folder',
+      confirmText: 'New',
+      onErrorCheck: (text) {
+        if (text.isEmpty) return 'text required!';
+        if (files.any((e) => e.name == text)) {
+          return 'already exists!';
+        }
+        return null;
+      },
+    );
+    if (name == null) return;
+    try {
+      final newFolder = Directory(dir.join(name));
+      if (!newFolder.existsSync()) {
+        await newFolder.create(recursive: true);
+      }
+      await scan();
+    } catch (e) {
+      if (!mounted) return;
+      showErrorDialog(context, e.toString());
+    }
   }
 
   bool get canGoBack {
@@ -65,36 +100,67 @@ class _FileExpState extends State<FileExp> {
     context.pop<String>(dir.path);
   }
 
+  ColorScheme get col => Theme.of(context).colorScheme;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: _appbar(),
-      body: RefreshIndicator.adaptive(
-        onRefresh: scan,
-        child: CustomScrollView(
-          physics: AlwaysScrollableScrollPhysics(),
-          slivers: [
-            SliverAppBar(
-              automaticallyImplyLeading: false,
-              floating: true,
-              pinned: true,
-              actions: [
-                SizedBox(width: 10),
+      body: Stack(
+        fit: .expand,
+        children: [
+          RefreshIndicator.adaptive(
+            onRefresh: scan,
+            child: CustomScrollView(
+              physics: AlwaysScrollableScrollPhysics(),
+              slivers: [
                 if (canGoBack)
-                  FilledButton.icon(onPressed: goBack, label: Text('Go Back')),
-                if (canGoBack) Spacer(),
-                FilledButton.icon(
-                  onPressed: moveHere,
-                  icon: Icon(Icons.gps_fixed),
-                  label: Text('Move Here'),
-                ),
-                SizedBox(width: 10),
+                  SliverAppBar(
+                    automaticallyImplyLeading: false,
+                    floating: true,
+                    pinned: true,
+                    actions: [
+                      SizedBox(width: 10),
+                      if (canGoBack)
+                        FilledButton.icon(
+                          onPressed: goBack,
+                          label: Text('Go Back'),
+                          icon: Icon(Icons.arrow_back_ios_new_outlined),
+                        ),
+
+                      Spacer(),
+                    ],
+                  ),
+
+                _listWidget(),
+
+                SliverToBoxAdapter(child: SizedBox(height: 80)),
               ],
             ),
+          ),
+          Positioned(bottom: 0, left: 0, right: 0, child: _bottomBar()),
+        ],
+      ),
+    );
+  }
 
-            _listWidget(),
-          ],
-        ),
+  Container _bottomBar() {
+    return Container(
+      padding: .symmetric(vertical: 10, horizontal: 15),
+      decoration: BoxDecoration(
+        color: col.surfaceContainer,
+        borderRadius: .circular(12),
+      ),
+      child: Row(
+        children: [
+          FilledButton(onPressed: createFolder, child: Text('Create Folder')),
+          Spacer(),
+          FilledButton.icon(
+            onPressed: moveHere,
+            icon: Icon(Icons.gps_fixed),
+            label: Text('Move Here'),
+          ),
+        ],
       ),
     );
   }
@@ -105,6 +171,8 @@ class _FileExpState extends State<FileExp> {
       actions: [
         Row(
           children: [
+            if (!AppUtil.instance.isMobileNotifier.value)
+              IconButton(onPressed: scan, icon: Icon(Icons.refresh)),
             Text('Hidden File'),
             Checkbox.adaptive(
               value: showHidden,
@@ -144,21 +212,27 @@ class _FileExpState extends State<FileExp> {
   }
 
   Widget listItem(FileSystemEntity file) {
-    return Row(
-      children: [
-        thumbnail(file),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: .start,
-            spacing: 4,
-            children: [
-              Text(file.name, maxLines: 2, overflow: .ellipsis),
-              if (file is File)
-                Text('Size: ${FileSizeLabelExtension(file).fileSizeLabel()}'),
-            ],
+    return Container(
+      decoration: BoxDecoration(
+        color: col.surfaceContainer.withValues(alpha: .45),
+        borderRadius: .circular(15),
+      ),
+      child: Row(
+        children: [
+          thumbnail(file),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: .start,
+              spacing: 4,
+              children: [
+                Text(file.name, maxLines: 2, overflow: .ellipsis),
+                if (file is File)
+                  Text('Size: ${FileSizeLabelExtension(file).fileSizeLabel()}'),
+              ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 

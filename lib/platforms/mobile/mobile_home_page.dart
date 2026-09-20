@@ -10,6 +10,7 @@ import 'package:tvp_player/platforms/components/dialog/error_alert_dialog.dart';
 import 'package:tvp_player/platforms/components/folder_grid_item.dart';
 import 'package:tvp_player/platforms/components/list_view_style/list_view_style.dart';
 import 'package:tvp_player/platforms/components/v_file_grid_item.dart';
+import 'package:tvp_player/platforms/mobile/vf_selection_item.dart';
 import 'package:tvp_player/platforms/pages/vfile_result_page.dart';
 import 'package:tvp_player/routers.dart';
 
@@ -43,6 +44,26 @@ class _MobileHomePageState extends State<MobileHomePage> {
     }
   }
 
+  void moveMulti() async {
+    final success = await showVFilesMoveDir(
+      context,
+      VfSelectionItem.pathsNotifer.value,
+    );
+    if (!success) return;
+    VfSelectionItem.pathsNotifer.value = [];
+    VfSelectionItem.selectionEnableNotifier.value = false;
+  }
+
+  void deleteMulti() async {
+    final success = await showVFileDeleteMulti(
+      context,
+      VfSelectionItem.pathsNotifer.value,
+    );
+    if (!success) return;
+    VfSelectionItem.pathsNotifer.value = [];
+    VfSelectionItem.selectionEnableNotifier.value = false;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -61,6 +82,7 @@ class _MobileHomePageState extends State<MobileHomePage> {
               slivers: [
                 if (files.isEmpty) _emptyWidget(),
                 if (files.isNotEmpty) SliverToBoxAdapter(child: _header),
+                _selectActionBar(),
                 _listWidget(files),
               ],
             ),
@@ -86,6 +108,16 @@ class _MobileHomePageState extends State<MobileHomePage> {
         },
       ),
       SizedBox(width: 10),
+      if (!AppUtil.instance.isMobileNotifier.value)
+        IconButton(
+          style: IconButton.styleFrom(
+            backgroundColor: col.surfaceContainer,
+            foregroundColor: col.onSurfaceVariant,
+          ),
+          onPressed: con.loadFiles,
+          icon: Icon(Icons.refresh_outlined),
+        ),
+      if (!AppUtil.instance.isMobileNotifier.value) SizedBox(width: 10),
     ],
   );
 
@@ -144,6 +176,53 @@ class _MobileHomePageState extends State<MobileHomePage> {
     );
   }
 
+  Widget _selectActionBar() {
+    return ValueListenableBuilder(
+      valueListenable: VfSelectionItem.selectionEnableNotifier,
+      builder: (context, enable, child) {
+        if (!enable) {
+          return SliverToBoxAdapter();
+        }
+        return ValueListenableBuilder(
+          valueListenable: VfSelectionItem.pathsNotifer,
+          builder: (context, paths, child) {
+            return SliverAppBar(
+              snap: false,
+              floating: true,
+              pinned: true,
+              actions: [
+                SizedBox(width: 10),
+                FilledButton.icon(
+                  onPressed: () {
+                    paths.clear();
+                    setState(() {
+                      VfSelectionItem.selectionEnableNotifier.value = false;
+                    });
+                  },
+                  icon: Icon(Icons.clear_outlined),
+                  label: Text('${paths.length} Selected'),
+                ),
+                Spacer(),
+                if (paths.isNotEmpty)
+                  IconButton(
+                    onPressed: moveMulti,
+                    icon: Icon(Icons.drive_file_move),
+                  ),
+                if (paths.isNotEmpty) SizedBox(width: 10),
+                if (paths.isNotEmpty)
+                  IconButton(
+                    onPressed: deleteMulti,
+                    icon: Icon(Icons.delete_outline, color: Colors.red),
+                  ),
+              ],
+              automaticallyImplyLeading: false,
+            );
+          },
+        );
+      },
+    );
+  }
+
   Widget _listWidget(List<VFile> files) {
     // folder
     return ValueListenableBuilder(
@@ -190,14 +269,28 @@ class _MobileHomePageState extends State<MobileHomePage> {
           childAspectRatio: 240 / 210,
         ),
         itemCount: files.length,
-        itemBuilder: (context, index) => VFileGridItem(
+        itemBuilder: (context, index) => VfSelectionItem(
           file: files[index],
-          onClicked: (file) {
-            goVfPlayer(context, file);
-          },
-          onMenu: (file) {
-            showVFileMenu(context, file);
-          },
+          child: VFileGridItem(
+            file: files[index],
+            onClicked: (file) {
+              if (VfSelectionItem.selectionEnableNotifier.value) {
+                VfSelectionItem.toggleCheck(file);
+                return;
+              }
+              goVfPlayer(context, file);
+            },
+            onMenu: (file) {
+              if (VfSelectionItem.selectionEnableNotifier.value) {
+                return;
+              }
+              showVFileMenu(context, file);
+            },
+            onLongPress: () {
+              VfSelectionItem.selectionEnableNotifier.value = true;
+              VfSelectionItem.toggleCheck(files[index]);
+            },
+          ),
         ),
       ),
     );

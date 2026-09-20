@@ -13,7 +13,7 @@ class VThumbnail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cacheFile = File(
-      AppUtil.instance.getPlatformCachePath('${file.name.onlyName}.png'),
+      AppUtil.instance.getPlatformCachePath('${file.name.onlyName}.jpg'),
     );
     if (cacheFile.existsSync()) {
       return Image.file(
@@ -24,7 +24,7 @@ class VThumbnail extends StatelessWidget {
       );
     }
     return FutureBuilder(
-      future: PlatformUtil.genThumbnail(file, cacheFile.path),
+      future: PlatformUtil.genThumbnail(file, cacheFile),
       builder: (context, snapshot) {
         if (snapshot.connectionState == .waiting) {
           return Center(child: CircularProgressIndicator.adaptive());

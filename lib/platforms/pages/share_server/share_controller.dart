@@ -48,10 +48,10 @@ class ShareController {
         return;
       }
       final coverFile = File(
-        AppUtil.instance.getPlatformCachePath('${item.name.onlyName}.png'),
+        AppUtil.instance.getPlatformCachePath('${item.name.onlyName}.jpg'),
       );
       if (!coverFile.existsSync()) {
-        await PlatformUtil.genThumbnail(item, coverFile.path);
+        await PlatformUtil.genThumbnail(item, coverFile);
       }
 
       await ctx.response.download(coverFile);
