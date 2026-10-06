@@ -31,6 +31,7 @@ dependencies:
   t_server:
     git: https://github.com/ThanCoder/t_server.git
   uuid: ^4.6.0
+  url_launcher: ^6.3.3
   # than_media_tag:
   #   git: https://github.com/ThanCoder/than_media_tag.git
 

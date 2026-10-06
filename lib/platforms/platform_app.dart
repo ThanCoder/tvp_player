@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:dart_core_extensions/dart_core_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:t_widgets/t_widgets.dart';
 import 'package:tvp_player/core/util/app_util.dart';
@@ -49,6 +50,9 @@ class _PlatformAppState extends State<PlatformApp> {
   Widget get _body {
     return LayoutBuilder(
       builder: (context, constraints) {
+        if (TPlatform.isMobile) {
+          return MobileHomeScreen();
+        }
         final isMobile = constraints.maxWidth <= 500;
         AppUtil.instance.isMobileNotifier.value = isMobile;
         this.constraints = constraints;

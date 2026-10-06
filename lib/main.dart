@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:audio_session/audio_session.dart';
 import 'package:flutter/material.dart';
 import 'package:than_pkg_linux/than_pkg_linux.dart';
 import 'package:tvp_player/core/controllers/i_controller.dart';
@@ -18,8 +17,8 @@ void main() async {
   if (Platform.isLinux) {
     final cf = AppUtil.instance.config;
     ThanPkgLinux.getInstance.window.setWindowSize(
-      width: cf.getDouble(appWindowWidthKey,600).toInt(),
-      height: cf.getDouble(appWindowHeightKey,400).toInt(),
+      width: cf.getDouble(appWindowWidthKey, 600).toInt(),
+      height: cf.getDouble(appWindowHeightKey, 400).toInt(),
     );
   }
 
@@ -30,12 +29,6 @@ void main() async {
     windows: true,
     linux: true,
   );
-
-  if (Platform.isAndroid) {
-    final session = await AudioSession.instance;
-    // await session.configure(AudioSessionConfiguration.music());
-    await session.setActive(true);
-  }
 
   ControllerManager.register(VFileController());
   ControllerManager.initAll();

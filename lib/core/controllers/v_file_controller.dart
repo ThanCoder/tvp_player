@@ -20,9 +20,6 @@ final durationSortItem = TSortItem(
 );
 
 class VFileController extends IController {
-  @override
-  Future<void> init() async {}
-
   List<VFile> files = [];
   bool loading = false;
   final groups = <String, List<VFile>>{};
@@ -33,6 +30,15 @@ class VFileController extends IController {
     .sizeTSortItem,
     durationSortItem,
   ];
+
+  @override
+  Future<void> init() async {
+    // if (Platform.isAndroid) {
+    //   ThanPkgAndroid.getInstance.mediaSelector.onMediaChanged.listen(
+    //     (event) {},
+    //   );
+    // }
+  }
 
   Future<void> loadFiles() async {
     loading = true;

@@ -52,6 +52,7 @@ class _TvPlayerPageState extends State<TvPlayerPage> {
     if (Platform.isAndroid) {
       ThanPkgAndroid.getInstance.flutterUtils.toggleFullscreen(true);
     }
+
     super.initState();
     init();
   }
@@ -78,12 +79,15 @@ class _TvPlayerPageState extends State<TvPlayerPage> {
     _headphonesSession?.cancel();
 
     player.dispose();
-
+    if (Platform.isAndroid) {
+      session?.setActive(false);
+    }
     super.dispose();
   }
 
   StreamSubscription? _headphonesSession;
   StreamSubscription? _bluetoothSession;
+  AudioSession? session;
 
   Future<void> init() async {
     final lastPos = config.getInt('$tvPlayerLastPosKey-${widget.file.id}');
@@ -92,13 +96,14 @@ class _TvPlayerPageState extends State<TvPlayerPage> {
 
     // audio session
     if (Platform.isAndroid) {
-      final session = await AudioSession.instance;
-      _headphonesSession = session.becomingNoisyEventStream.listen((_) {
+      session = await AudioSession.instance;
+      session?.setActive(true);
+      _headphonesSession = session?.becomingNoisyEventStream.listen((_) {
         // The user unplugged the headphones, so we should pause or lower the volume.
         player.pause();
       });
 
-      _bluetoothSession = session.devicesChangedEventStream.listen((event) {
+      _bluetoothSession = session?.devicesChangedEventStream.listen((event) {
         for (var deviceRemoved in event.devicesRemoved) {
           // bluetooth
           if (deviceRemoved.type == .bluetoothA2dp ||

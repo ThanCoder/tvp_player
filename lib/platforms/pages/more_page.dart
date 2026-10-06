@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:t_widgets/t_widgets.dart';
 import 'package:tvp_player/core/util/app_util.dart';
+import 'package:tvp_player/platforms/components/dialog/app_about_dialog.dart';
 import 'package:tvp_player/platforms/pages/cache_manager.dart';
+import 'package:tvp_player/platforms/pages/dev_pages/dev_route_tile.dart';
 
 import 'share_server/server_home_page.dart';
 import 'version_manager.dart';
@@ -34,6 +36,8 @@ class MorePage extends StatelessWidget {
               );
             },
           ),
+          DevRouteTile(),
+          AppAboutDialogListTile(appDesc: 'Video Player Application.'),
         ],
       ),
     );
