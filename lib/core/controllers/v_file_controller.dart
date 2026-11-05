@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:dart_core_extensions/dart_core_extensions.dart';
+import 'package:flutter/material.dart';
 import 'package:t_widgets/t_widgets.dart';
 import 'package:tvp_player/core/controllers/i_controller.dart';
 import 'package:tvp_player/core/models/v_file.dart';
@@ -41,15 +42,21 @@ class VFileController extends IController {
   }
 
   Future<void> loadFiles() async {
-    loading = true;
-    addEvent(Loading());
-    files = await PlatformUtil.scanVideoFiles();
-    sort();
+    try {
+      loading = true;
+      addEvent(Loading());
+      files = await PlatformUtil.scanVideoFiles();
+      sort();
 
-    _loadGroups();
+      _loadGroups();
 
-    loading = false;
-    addEvent(Loaded());
+      loading = false;
+      addEvent(Loaded());
+    } catch (e) {
+      loading = false;
+      addEvent(Loaded());
+      debugPrint('[VFileController:loadFiles]: $e');
+    }
   }
 
   void _loadGroups() {

@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:mediatag_bin/mediatag_bin.dart';
 import 'package:than_pkg_linux/than_pkg_linux.dart';
 import 'package:tvp_player/core/controllers/i_controller.dart';
 import 'package:tvp_player/core/controllers/v_file_controller.dart';
@@ -13,6 +14,8 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await AppUtil.instance.init();
+
+  await MediatagBin.instance.initailize();
 
   if (Platform.isLinux) {
     final cf = AppUtil.instance.config;

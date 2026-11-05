@@ -3,6 +3,7 @@ import 'dart:isolate';
 
 import 'package:dart_core_extensions/dart_core_extensions.dart';
 import 'package:flutter/foundation.dart';
+import 'package:mediatag_bin/mediatag_bin.dart';
 import 'package:than_pkg_android/than_pkg_android.dart';
 import 'package:than_pkg_linux/than_pkg_linux.dart';
 import 'package:tvp_player/core/models/v_file.dart';
@@ -56,7 +57,8 @@ class PlatformUtil {
 
   static Future<List<VFile>> scanVideoFiles() async {
     final List<VFile> files = [];
-    if (Platform.isLinux) {
+    if (Platform.isLinux || Platform.isWindows) {
+      final pkg = MediatagBin.instance;
       final home = Platform.environment['HOME']!;
       final roots = <String>[
         home.join('Documents'),
@@ -74,18 +76,15 @@ class PlatformUtil {
               Duration dur = .new();
               bool thumbnailExists = false;
 
-              // final fmt = AvFormat();
-              // final fmtRes = fmt.open(f.path);
-              // if (fmtRes.isErr) {
-              //   continue;
-              // }
-              // fmt.loadInfo();
-              // for (var stm in fmt.infoList) {
-              //   if (stm is VideoStreamInfo) {
-              //     dur = stm.duration;
-              //     thumbnailExists = true;
-              //   }
-              // }
+              try {
+                final info = pkg.ffprobe.getFileInfoOrNullSync(f.path);
+                if (info != null) {
+                  dur = info.format.duration;
+                  // print(info.);
+                }
+              } catch (e) {
+                debugPrint('[PlatformUtil:scanVideoFiles]: $e');
+              }
 
               files.add(
                 .new(
@@ -99,9 +98,6 @@ class PlatformUtil {
                   thumbnailExists: thumbnailExists,
                 ),
               );
-              // if (fmtRes.isOk) {
-              //   fmt.close();
-              // }
             }
             if (f is Directory) {
               scanFolder.add(f.directory);

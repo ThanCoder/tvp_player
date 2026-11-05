@@ -49,10 +49,10 @@ class _ShareDownloaderDialogState extends State<ShareDownloaderDialog> {
       url,
       widget.outPath,
       token: token,
-      onProgress: (progress) {
-        if (!mounted) return;
+      onProgress:(total, loaded) {
+         if (!mounted) return;
         setState(() {
-          this.progress = progress;
+          progress = loaded / total;
         });
       },
     );

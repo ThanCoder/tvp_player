@@ -11,29 +11,29 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  cupertino_icons: ^1.0.8
+  cupertino_icons: ^2.0.0
   media_kit: ^1.2.6
   video_player_media_kit: ^2.0.0
   media_kit_libs_video: ^1.0.7
   video_player: ^2.14.0
   package_info_plus: ^10.2.1
   path_provider: ^2.1.6
-  dart_core_extensions: ^0.6.0
+  dart_core_extensions: ^0.7.0
   than_pkg_android: ^0.7.0
   than_pkg_linux: ^0.2.0
-  cfb_store: ^0.7.0
+  cfb_store: ^0.8.0
   audio_session: ^0.2.4
   media_kit_video: ^2.0.1
+  uuid: ^4.6.0
+  url_launcher: ^6.3.3
   t_widgets:
     git: https://github.com/ThanCoder/t_widgets.git
   t_client:
     git: https://github.com/ThanCoder/t_client
   t_server:
     git: https://github.com/ThanCoder/t_server.git
-  uuid: ^4.6.0
-  url_launcher: ^6.3.3
-  # than_media_tag:
-  #   git: https://github.com/ThanCoder/than_media_tag.git
+  mediatag_bin:
+    git: https://github.com/ThanCoder/mediatag_bin.git
 
 dev_dependencies:
   flutter_test:
