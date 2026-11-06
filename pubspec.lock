@@ -493,7 +493,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: db74dee0af26f1d2e57ecc26cfaad15e7e09557f
+      resolved-ref: "91adff2de7823fa0c240f4860d92355489c27506"
       url: "https://github.com/ThanCoder/mediatag_bin.git"
     source: git
     version: "0.1.0"

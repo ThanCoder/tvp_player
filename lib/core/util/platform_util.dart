@@ -78,8 +78,8 @@ class PlatformUtil {
 
               try {
                 final info = pkg.ffprobe.getFileInfoOrNullSync(f.path);
-                if (info != null) {
-                  dur = info.format.duration;
+                if (info != null && info.formatOrNull != null) {
+                  dur = info.formatOrNull!.duration;
                   thumbnailExists = true;
                 }
               } catch (e) {
@@ -134,7 +134,7 @@ class PlatformUtil {
     File saveFile, {
     Duration position = const Duration(seconds: 1),
   }) async {
-    if (saveFile.existsSync()) return;
+    if (await saveFile.exists()) return;
     if (Platform.isAndroid) {
       await ThanPkgAndroid.getInstance.videoHandler.saveThumbnail(
         file.path,
@@ -145,10 +145,9 @@ class PlatformUtil {
       // print('savePath: $savePath');
       // return;
       if (!file.thumbnailExists) return;
-      final ext = saveFile.extName;
       await MediatagBin.instance.ffmpeg.video.genThumbnail(
         file.path,
-        saveFile.path.replaceAll('.$ext', ''),
+        saveFile.path,
       );
     }
   }

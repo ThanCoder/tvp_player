@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:t_widgets/t_widgets.dart';
 import 'package:tvp_player/core/controllers/i_controller.dart';
 import 'package:tvp_player/core/models/v_file.dart';
+import 'package:tvp_player/core/util/app_util.dart';
 import 'package:tvp_player/core/util/platform_util.dart';
+import 'package:tvp_player/keys.dart';
 
 class Rename extends IControllerEvent {
   final VFile file;
@@ -31,14 +33,19 @@ class VFileController extends IController {
     .sizeTSortItem,
     durationSortItem,
   ];
+  final _cf = AppUtil.instance.config;
 
   @override
   Future<void> init() async {
-    // if (Platform.isAndroid) {
-    //   ThanPkgAndroid.getInstance.mediaSelector.onMediaChanged.listen(
-    //     (event) {},
-    //   );
-    // }
+    final sortId = _cf.getInt(appSortIdKey, -1);
+    final sortVal = _cf.getBool(appSortValueKey, true);
+    if (sortId != -1) {
+      sortItem = sortList.firstWhere(
+        (e) => e.id == sortId,
+        orElse: () => .dateTSortItem,
+      );
+      sortItem = sortItem.copyWith(isTrue: sortVal);
+    }
   }
 
   Future<void> loadFiles() async {
@@ -83,6 +90,7 @@ class VFileController extends IController {
 
   void setSort(TSortItem item) {
     sortItem = item;
+    _cf.put(appSortIdKey, item.id).put(appSortValueKey, item.isTrue).writeAll();
     sort();
     _loadGroups();
 

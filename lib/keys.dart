@@ -1,6 +1,8 @@
 const String appThemeKey = 'appThemeKey';
 const String appWindowWidthKey = 'appWindowWidthKey';
 const String appWindowHeightKey = 'appWindowHeightKey';
+const String appSortIdKey = 'appSortIdKey';
+const String appSortValueKey = 'appSortValueKey';
 
 const String vfListViewStyleKey = 'vfListViewStyleKey';
 const String tvPlayerLastPosKey = 'tvPlayerLastPosKey';

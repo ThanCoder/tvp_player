@@ -3,6 +3,7 @@ import 'package:t_widgets/t_widgets.dart';
 import 'package:tvp_player/core/controllers/i_controller.dart';
 import 'package:tvp_player/core/controllers/v_file_controller.dart';
 import 'package:tvp_player/core/models/v_file.dart';
+import 'package:tvp_player/core/util/app_util.dart';
 import 'package:tvp_player/funcs.dart';
 import 'package:tvp_player/platforms/components/v_file_grid_item.dart';
 import 'package:tvp_player/routers.dart';
@@ -47,6 +48,8 @@ class _VfileResultPageState extends State<VfileResultPage> {
     });
   }
 
+  ColorScheme get col => Theme.of(context).colorScheme;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -88,7 +91,18 @@ class _VfileResultPageState extends State<VfileResultPage> {
           );
         },
       ),
-      SizedBox(width: 10),
+      if (!AppUtil.instance.isMobileNotifier.value) SizedBox(width: 10),
+
+      if (!AppUtil.instance.isMobileNotifier.value)
+        IconButton(
+          style: IconButton.styleFrom(
+            backgroundColor: col.surfaceContainer,
+            foregroundColor: col.onSurfaceVariant,
+          ),
+          onPressed: con.loadFiles,
+          icon: Icon(Icons.refresh_outlined),
+        ),
+      if (!AppUtil.instance.isMobileNotifier.value) SizedBox(width: 10),
     ],
   );
 
