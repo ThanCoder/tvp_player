@@ -1,4 +1,5 @@
 import 'package:dart_core_extensions/dart_core_extensions.dart';
+import 'package:tvp_player/core/util/utils.dart';
 
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 class VFile {
@@ -85,11 +86,9 @@ extension VFileX on List<VFile> {
 
   void sortName({bool aToZ = true}) {
     sort((a, b) {
-      if (aToZ) {
-        return a.name.compareTo(b.name);
-      } else {
-        return b.name.compareTo(a.name);
-      }
+      return aToZ
+          ? naturalCompare(a.name, b.name)
+          : naturalCompare(b.name, a.name);
     });
   }
 
