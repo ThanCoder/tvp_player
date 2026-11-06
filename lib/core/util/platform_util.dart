@@ -80,10 +80,12 @@ class PlatformUtil {
                 final info = pkg.ffprobe.getFileInfoOrNullSync(f.path);
                 if (info != null) {
                   dur = info.format.duration;
-                  // print(info.);
+                  thumbnailExists = true;
                 }
               } catch (e) {
-                debugPrint('[PlatformUtil:scanVideoFiles]: $e');
+                debugPrint(
+                  '[PlatformUtil:scanVideoFiles]: $e -> name:${f.name}',
+                );
               }
 
               files.add(
@@ -139,32 +141,15 @@ class PlatformUtil {
         saveFile.path,
       );
     }
-    if (Platform.isLinux) {
+    if (MediatagBin.instance.isSupported) {
       // print('savePath: $savePath');
       // return;
       if (!file.thumbnailExists) return;
-      try {
-        final result = await Process.run('ffmpeg', [
-          '-ss',
-          (position.inMilliseconds / 1000).toString(),
-          '-i',
-          file.path,
-          '-frames:v',
-          '1',
-          '-q:v',
-          '2',
-          '-y',
-          saveFile.path,
-        ]);
-
-        if (result.exitCode != 0) {
-          debugPrint(
-            '[PlatformUtil:genThumbnail]: FFmpeg error: ${result.stderr}',
-          );
-        }
-      } catch (e, st) {
-        debugPrint('[PlatformUtil:genThumbnail]: $e\n$st');
-      }
+      final ext = saveFile.extName;
+      await MediatagBin.instance.ffmpeg.video.genThumbnail(
+        file.path,
+        saveFile.path.replaceAll('.$ext', ''),
+      );
     }
   }
 }

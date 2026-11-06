@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:dart_core_extensions/dart_core_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:tvp_player/core/models/v_file.dart';
 import 'package:tvp_player/core/util/app_util.dart';
@@ -13,7 +12,7 @@ class VThumbnail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cacheFile = File(
-      AppUtil.instance.getPlatformCachePath('${file.name.onlyName}.jpg'),
+      AppUtil.instance.getPlatformCachePath('${file.id}.jpg'),
     );
     if (cacheFile.existsSync()) {
       return Image.file(

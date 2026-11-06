@@ -71,6 +71,7 @@ class _PromptAlertDialogState extends State<PromptAlertDialog> {
   void initState() {
     con.text = widget.promptText;
     focusNode.requestFocus();
+    con.selectAll();
     super.initState();
     if (widget.onErrorCheck != null) {
       onChanged(con.text);

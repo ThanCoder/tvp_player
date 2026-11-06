@@ -29,6 +29,10 @@ abstract class IController {
     }
   }
 
+  T read<T extends IController>() {
+    return ControllerManager.read<T>();
+  }
+
   Future<void> dispose() async {
     await _con.close();
   }
