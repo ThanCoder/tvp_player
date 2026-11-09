@@ -132,7 +132,7 @@ class PlatformUtil {
   static Future<void> genThumbnail(
     VFile file,
     File saveFile, {
-    Duration position = const Duration(seconds: 1),
+    Duration position = const Duration(seconds: 15),
   }) async {
     if (await saveFile.exists()) return;
     if (Platform.isAndroid) {
