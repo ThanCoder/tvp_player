@@ -1,4 +1,4 @@
-package than.app.tvp.tvp_player
+package than.ddev.tvp.player
 
 import io.flutter.embedding.android.FlutterActivity
 

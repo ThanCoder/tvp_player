@@ -7,6 +7,7 @@ import 'package:mediatag_bin/mediatag_bin.dart';
 import 'package:than_pkg_android/than_pkg_android.dart';
 import 'package:than_pkg_linux/than_pkg_linux.dart';
 import 'package:tvp_player/core/models/v_file.dart';
+import 'package:tvp_player/core/util/app_util.dart';
 import 'package:tvp_player/keys.dart';
 import 'package:uuid/v4.dart';
 
@@ -130,10 +131,14 @@ class PlatformUtil {
   }
 
   static Future<void> genThumbnail(VFile file, File saveFile) async {
-    Duration position = const Duration(seconds: videoThumbnailGenDurationSec);
-
+    Duration position = Duration(
+      seconds: AppUtil.instance.config.getInt(
+        videoThumbnailGenDurationSecKey,
+        videoThumbnailGenDurationSec,
+      ),
+    );
     if (await saveFile.exists()) return;
-    
+
     if (Platform.isAndroid) {
       await ThanPkgAndroid.getInstance.videoHandler.saveThumbnail(
         file.path,
@@ -141,17 +146,22 @@ class PlatformUtil {
         time: position,
       );
     }
-    if (saveFile.existsSync()) return;
+    // print('${file.name} - dur: ${file.duration} - ${saveFile.existsSync()}');
+
+    if (await saveFile.exists()) return;
 
     if (MediatagBin.instance.isSupported) {
       // print('savePath: $savePath');
       // return;
-      if (!file.thumbnailExists) return;
-      await MediatagBin.instance.ffmpeg.video.genThumbnail(
+      // if (!file.thumbnailExists) return;
+      final res = await MediatagBin.instance.ffmpeg.video.genThumbnail(
         file.path,
         saveFile.path,
         duration: position,
       );
+      if (res.isErr) {
+        print('gen error: ${file.name} \nmsg: ${res.unwrapError()}');
+      }
     }
   }
 }

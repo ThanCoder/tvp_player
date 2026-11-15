@@ -22,6 +22,7 @@ class VThumbnail extends StatelessWidget {
             Icon(Icons.image_not_supported_outlined, size: 50),
       );
     }
+    // print('gen: ${file.name}');
     return FutureBuilder(
       future: PlatformUtil.genThumbnail(file, cacheFile),
       builder: (context, snapshot) {

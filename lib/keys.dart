@@ -9,7 +9,7 @@ const String tvPlayerLastPosKey = 'tvPlayerLastPosKey';
 
 const String videoThumbnailGenDurationSecKey =
     'videoThumbnailGenDurationSecKey';
-const int videoThumbnailGenDurationSec = 15;
+const int videoThumbnailGenDurationSec = 30;
 
 const List<String> videoExts = [
   'mp4',
