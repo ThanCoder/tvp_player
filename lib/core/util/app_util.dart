@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:cfb_store/cfb_store.dart';
 import 'package:dart_core_extensions/dart_core_extensions.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:than_pkg_linux/than_pkg_linux.dart';
@@ -46,6 +46,15 @@ class AppUtil {
       return _cacheDir.join(name);
     }
     return _cacheDir.path;
+  }
+
+  bool get platformCacheExists {
+    final dir = Directory(getPlatformCachePath());
+    if (dir.existsSync()) {
+      final ls = dir.listSync(recursive: false);
+      return ls.isNotEmpty;
+    }
+    return false;
   }
 
   String getPlatformConfigPath([String? name]) {

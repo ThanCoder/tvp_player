@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
-import 'package:t_widgets/t_widgets.dart';
+import 'package:tvp_player/ui/index.dart';
 import 'package:tvp_player/core/models/v_file.dart';
 import 'package:tvp_player/core/util/app_util.dart';
 import 'package:tvp_player/keys.dart';

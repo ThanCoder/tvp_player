@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
-import 'package:t_widgets/t_widgets.dart';
+import 'package:material_ui/material_ui.dart';
+import 'package:tvp_player/ui/index.dart';
 import 'package:tvp_player/core/models/v_file.dart';
 import 'package:tvp_player/platforms/components/v_thumbnail.dart';
 
@@ -10,7 +10,7 @@ class VfFileInfoMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TScrollableColumn(
+    return ScrollableColumn(
       children: [
         _Header(file: file),
 

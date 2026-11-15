@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:tvp_player/core/util/app_util.dart';
 import 'package:tvp_player/keys.dart';
 

@@ -1,11 +1,10 @@
 import 'dart:io';
 
 import 'package:dart_core_extensions/dart_core_extensions.dart';
-import 'package:flutter/material.dart';
-import 'package:t_widgets/t_widgets.dart';
+import 'package:dart_core_extensions/utils.dart';
+import 'package:material_ui/material_ui.dart';
+import 'package:tvp_player/ui/index.dart';
 import 'package:tvp_player/core/util/app_util.dart';
-import 'package:tvp_player/platforms/components/dialog/error_alert_dialog.dart';
-import 'package:tvp_player/platforms/components/dialog/prompt_alert_dialog.dart';
 
 class FileExp extends StatefulWidget {
   const new({super.key, required this.rootDir});
@@ -32,17 +31,22 @@ class _FileExpState extends State<FileExp> {
       files.clear();
       if (showHidden) {
         final res = dir.listSync();
-        files.addAll(res);
+        for (var f in res) {
+          if (!f.isDirectory) continue;
+          files.add(f);
+        }
         setState(() {});
       } else {
         final res = dir.listSync();
         for (var f in res) {
           if (f.name.startsWith('.')) continue;
+          if (!f.isDirectory) continue;
           files.add(f);
         }
         setState(() {});
       }
-      files.sort((a, b) => a.name.compareTo(b.name));
+      // files.sort((a, b) => a.name.compareTo(b.name));
+      files.sort((a, b) => naturalCompare(a.name, b.name));
 
       files.sort((a, b) {
         if (a is Directory && b is File) return -1;
@@ -54,9 +58,8 @@ class _FileExpState extends State<FileExp> {
     }
   }
 
-  void onClicked(FileSystemEntity file) {
-    if (file is! Directory) return;
-    dir = file.directory;
+  void onClicked(Directory folder) {
+    dir = folder;
     scan();
   }
 
@@ -79,7 +82,7 @@ class _FileExpState extends State<FileExp> {
       if (!newFolder.existsSync()) {
         await newFolder.create(recursive: true);
       }
-      await scan();
+      onClicked(newFolder);
     } catch (e) {
       if (!mounted) return;
       showErrorDialog(context, e.toString());
@@ -167,7 +170,7 @@ class _FileExpState extends State<FileExp> {
 
   AppBar _appbar() {
     return AppBar(
-      title: Text('File Exp'),
+      title: Text(dir.name, style: TextStyle(fontSize: 14, fontWeight: .w700)),
       actions: [
         Row(
           children: [
@@ -201,7 +204,9 @@ class _FileExpState extends State<FileExp> {
             itemBuilder: (context, index) {
               final file = files[index];
               return InkWell(
-                onTap: () => onClicked(file),
+                onTap: !file.isDirectory
+                    ? null
+                    : () => onClicked(file.directory),
                 child: listItem(file),
               );
             },

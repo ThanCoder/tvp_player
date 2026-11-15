@@ -1,8 +1,8 @@
 import 'dart:io';
 
 import 'package:dart_core_extensions/dart_core_extensions.dart';
-import 'package:flutter/material.dart';
-import 'package:t_widgets/t_widgets.dart';
+import 'package:material_ui/material_ui.dart';
+import 'package:tvp_player/ui/index.dart';
 import 'package:tvp_player/core/util/p_utils.dart';
 
 class CacheManagerListTile extends StatefulWidget {

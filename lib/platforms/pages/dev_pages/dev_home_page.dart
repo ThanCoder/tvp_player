@@ -1,6 +1,5 @@
-import 'package:flutter/material.dart';
-import 'package:t_widgets/t_widgets.dart';
-import 'package:tvp_player/platforms/components/dialog/error_alert_dialog.dart';
+import 'package:material_ui/material_ui.dart';
+import 'package:tvp_player/ui/index.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'dev_page_api.dart';

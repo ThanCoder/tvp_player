@@ -1,5 +1,5 @@
 import 'package:dart_core_extensions/dart_core_extensions.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:tvp_player/core/controllers/i_controller.dart';
 import 'package:tvp_player/core/controllers/v_file_controller.dart';
 import 'package:tvp_player/core/models/v_file.dart';

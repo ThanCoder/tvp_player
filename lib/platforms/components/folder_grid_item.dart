@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:tvp_player/core/models/v_file.dart';
 
 class FolderGridItem extends StatelessWidget {
@@ -10,12 +10,13 @@ class FolderGridItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final col = Theme.of(context).colorScheme;
     return Container(
-      padding: .all(4),
+      // padding: .all(2),
       decoration: BoxDecoration(
         borderRadius: .circular(15),
         color: col.surfaceContainer,
       ),
       child: Column(
+        crossAxisAlignment: .center,
         children: [
           Icon(Icons.folder_outlined, size: 90, color: col.outlineVariant),
           Text(
@@ -24,12 +25,14 @@ class FolderGridItem extends StatelessWidget {
             overflow: .ellipsis,
             style: TextStyle(fontWeight: .w600, color: col.onSurface),
           ),
-          Text(
-            files.length.toString().padLeft(2, '0'),
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: .w400,
-              color: col.onSurfaceVariant,
+          Expanded(
+            child: Text(
+              files.length.toString().padLeft(2, '0'),
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: .w400,
+                color: col.onSurfaceVariant,
+              ),
             ),
           ),
         ],

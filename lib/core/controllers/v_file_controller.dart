@@ -1,8 +1,8 @@
 import 'dart:io';
 
 import 'package:dart_core_extensions/dart_core_extensions.dart';
-import 'package:flutter/material.dart';
-import 'package:t_widgets/t_widgets.dart';
+import 'package:material_ui/material_ui.dart';
+import 'package:tvp_player/ui/index.dart';
 import 'package:tvp_player/core/controllers/i_controller.dart';
 import 'package:tvp_player/core/models/v_file.dart';
 import 'package:tvp_player/core/util/app_util.dart';
@@ -14,7 +14,7 @@ class Rename extends IControllerEvent {
   const Rename(this.file);
 }
 
-final durationSortItem = TSortItem(
+final durationSortItem = SortItem(
   id: 2,
   title: 'Duration',
   isTrue: true,
@@ -26,11 +26,11 @@ class VFileController extends IController {
   List<VFile> files = [];
   bool loading = false;
   final groups = <String, List<VFile>>{};
-  TSortItem sortItem = .dateTSortItem;
-  List<TSortItem> sortList = [
-    .nameTSortItem,
-    .dateTSortItem,
-    .sizeTSortItem,
+  SortItem sortItem = .dateItem;
+  List<SortItem> sortList = [
+    .nameItem,
+    .dateItem,
+    .sizeItem,
     durationSortItem,
   ];
   final _cf = AppUtil.instance.config;
@@ -42,7 +42,7 @@ class VFileController extends IController {
     if (sortId != -1) {
       sortItem = sortList.firstWhere(
         (e) => e.id == sortId,
-        orElse: () => .dateTSortItem,
+        orElse: () => .dateItem,
       );
       sortItem = sortItem.copyWith(isTrue: sortVal);
     }
@@ -74,13 +74,13 @@ class VFileController extends IController {
   }
 
   void sort() {
-    if (sortItem.id == TSortItem.dateTSortItem.id) {
+    if (sortItem.id == SortItem.dateItem.id) {
       files.sortData(newest: sortItem.isTrue);
     }
-    if (sortItem.id == TSortItem.nameTSortItem.id) {
+    if (sortItem.id == SortItem.nameItem.id) {
       files.sortName(aToZ: sortItem.isTrue);
     }
-    if (sortItem.id == TSortItem.sizeTSortItem.id) {
+    if (sortItem.id == SortItem.sizeItem.id) {
       files.sortSize(smallToBig: sortItem.isTrue);
     }
     if (sortItem.id == durationSortItem.id) {
@@ -88,7 +88,7 @@ class VFileController extends IController {
     }
   }
 
-  void setSort(TSortItem item) {
+  void setSort(SortItem item) {
     sortItem = item;
     _cf.put(appSortIdKey, item.id).put(appSortValueKey, item.isTrue).writeAll();
     sort();

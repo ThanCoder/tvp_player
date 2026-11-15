@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:tvp_player/platforms/mobile/mobile_home_page.dart';
-import 'package:tvp_player/platforms/pages/more_page.dart';
+import 'package:tvp_player/platforms/pages/more/more_page.dart';
 import 'package:tvp_player/platforms/pages/vf_search_page.dart';
 
 class DesktopHomeScreen extends StatefulWidget {

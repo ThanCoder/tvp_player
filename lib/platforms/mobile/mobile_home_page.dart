@@ -1,12 +1,11 @@
-import 'package:flutter/material.dart';
-import 'package:t_widgets/t_widgets.dart';
+import 'package:material_ui/material_ui.dart';
+import 'package:tvp_player/ui/index.dart';
 import 'package:tvp_player/core/controllers/i_controller.dart';
 import 'package:tvp_player/core/controllers/v_file_controller.dart';
 import 'package:tvp_player/core/models/v_file.dart';
 import 'package:tvp_player/core/util/app_util.dart';
 import 'package:tvp_player/core/util/platform_util.dart';
 import 'package:tvp_player/funcs.dart';
-import 'package:tvp_player/platforms/components/dialog/error_alert_dialog.dart';
 import 'package:tvp_player/platforms/components/folder_grid_item.dart';
 import 'package:tvp_player/platforms/components/list_view_style/list_view_style.dart';
 import 'package:tvp_player/platforms/components/v_file_grid_item.dart';
@@ -98,7 +97,7 @@ class _MobileHomePageState extends State<MobileHomePage> {
       StreamBuilder(
         stream: con.events.whereType<Loaded>(),
         builder: (context, asyncSnapshot) {
-          return TSortProviderButton(
+          return SortProviderButton(
             value: con.sortItem,
             list: con.sortList,
             onApply: (item) {
@@ -201,6 +200,16 @@ class _MobileHomePageState extends State<MobileHomePage> {
                   },
                   icon: Icon(Icons.clear_outlined),
                   label: Text('${paths.length} Selected'),
+                ),
+                SizedBox(width: 10),
+                FilledButton.icon(
+                  onPressed: () {
+                    final val = con.files.map(((e) => e.path)).toList();
+                    VfSelectionItem.pathsNotifer.value = val;
+                    setState(() {});
+                  },
+                  icon: Icon(Icons.select_all_outlined),
+                  label: Text('Selecte All'),
                 ),
                 Spacer(),
                 if (paths.isNotEmpty)

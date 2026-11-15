@@ -1,9 +1,8 @@
-import 'package:flutter/material.dart';
-import 'package:t_widgets/t_widgets.dart';
+import 'package:material_ui/material_ui.dart';
+import 'package:tvp_player/ui/index.dart';
 
 import 'receive_page.dart';
 import 'share_page.dart';
-
 
 class ServerHomePage extends StatelessWidget {
   const ServerHomePage({super.key});

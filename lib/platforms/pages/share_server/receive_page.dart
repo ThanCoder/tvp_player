@@ -1,12 +1,11 @@
 import 'dart:convert';
 
 import 'package:dart_core_extensions/dart_core_extensions.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:t_client/t_client.dart';
-import 'package:t_widgets/t_widgets.dart';
+import 'package:tvp_player/ui/index.dart';
 import 'package:tvp_player/core/models/v_file.dart';
 import 'package:tvp_player/core/util/platform_util.dart';
-import 'package:tvp_player/platforms/components/dialog/error_alert_dialog.dart';
 
 import 'active_host_scanner_dialog.dart';
 import 'share_download_menu.dart';
@@ -43,7 +42,7 @@ class _ReceivePageState extends State<ReceivePage> {
   List<VFile> files = [];
   List<VFile> result = [];
 
-  TSortItem sortItem = .dateTSortItem;
+  SortItem sortItem = .dateItem;
 
   Future<void> init() async {
     try {
@@ -134,15 +133,15 @@ class _ReceivePageState extends State<ReceivePage> {
     setState(() {});
   }
 
-  void onSortChanged(TSortItem val) {
+  void onSortChanged(SortItem val) {
     sortItem = val;
-    if (sortItem.id == TSortItem.dateTSortItem.id) {
+    if (sortItem.id == SortItem.dateItem.id) {
       files.sortData(newest: sortItem.isTrue);
     }
-    if (sortItem.id == TSortItem.nameTSortItem.id) {
+    if (sortItem.id == SortItem.nameItem.id) {
       files.sortName(aToZ: sortItem.isTrue);
     }
-    if (sortItem.id == TSortItem.sizeTSortItem.id) {
+    if (sortItem.id == SortItem.sizeItem.id) {
       files.sortSize(smallToBig: sortItem.isTrue);
     }
     setState(() {});
@@ -156,7 +155,7 @@ class _ReceivePageState extends State<ReceivePage> {
       body: RefreshIndicator.adaptive(
         onRefresh: init,
         child: isLoading
-            ? Center(child: TLoaderRandom())
+            ? Center(child:  Loader.random())
             : CustomScrollView(
                 physics: AlwaysScrollableScrollPhysics(),
                 slivers: [
@@ -180,9 +179,9 @@ class _ReceivePageState extends State<ReceivePage> {
       actions: [
         if (TPlatform.isDesktop && !isLoading)
           IconButton(onPressed: init, icon: Icon(Icons.refresh_outlined)),
-        TSortProviderButton(
+        SortProviderButton(
           value: sortItem,
-          list: [.dateTSortItem, .nameTSortItem, .sizeTSortItem],
+          list: [.dateItem, .nameItem, .sizeItem],
           onApply: onSortChanged,
         ),
         SizedBox(width: 10),

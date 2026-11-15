@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:t_client/t_client.dart';
-import 'package:t_widgets/t_widgets.dart';
+import 'package:tvp_player/ui/index.dart';
 import 'package:tvp_player/platforms/pages/share_server/share_controller.dart';
 
 class ActiveHostScannerDialog extends StatefulWidget {

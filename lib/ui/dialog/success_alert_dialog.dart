@@ -1,5 +1,6 @@
-import 'package:flutter/material.dart';
-import 'package:t_widgets/t_widgets.dart';
+import 'package:material_ui/material_ui.dart';
+
+import '../build_context_x.dart';
 
 void showSuccessDialog(BuildContext context, String message) {
   showDialog(

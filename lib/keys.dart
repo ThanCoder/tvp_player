@@ -7,6 +7,10 @@ const String appSortValueKey = 'appSortValueKey';
 const String vfListViewStyleKey = 'vfListViewStyleKey';
 const String tvPlayerLastPosKey = 'tvPlayerLastPosKey';
 
+const String videoThumbnailGenDurationSecKey =
+    'videoThumbnailGenDurationSecKey';
+const int videoThumbnailGenDurationSec = 15;
+
 const List<String> videoExts = [
   'mp4',
   'mkv',

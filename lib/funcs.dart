@@ -1,17 +1,15 @@
 import 'dart:io';
 
 import 'package:dart_core_extensions/dart_core_extensions.dart';
-import 'package:flutter/material.dart';
-import 'package:t_widgets/t_widgets.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:tvp_player/core/controllers/i_controller.dart';
 import 'package:tvp_player/core/controllers/v_file_controller.dart';
 import 'package:tvp_player/core/models/v_file.dart';
 import 'package:tvp_player/core/util/platform_util.dart';
-import 'package:tvp_player/platforms/components/dialog/confirm_alert_dialog.dart';
-import 'package:tvp_player/platforms/components/dialog/prompt_alert_dialog.dart';
 import 'package:tvp_player/platforms/components/v_file_menu.dart';
 import 'package:tvp_player/platforms/components/vf_file_info_menu.dart';
 import 'package:tvp_player/platforms/pages/file_exproler/file_exp.dart';
+import 'package:tvp_player/ui/index.dart';
 
 Future<void> showVFileMenu(BuildContext context, VFile file) async {
   showModalBottomSheet(
@@ -37,7 +35,7 @@ Future<void> showVFileRename(BuildContext context, VFile file) async {
     context,
     file.name.onlyName,
     barrierDismissible: false,
-    maxLines: null,
+    // maxLines: null,
     confirmText: 'Rename',
   );
   if (name == null) return;

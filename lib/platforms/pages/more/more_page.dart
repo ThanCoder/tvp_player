@@ -1,11 +1,11 @@
-import 'package:flutter/material.dart';
-import 'package:t_widgets/t_widgets.dart';
+import 'package:material_ui/material_ui.dart';
+import 'package:tvp_player/ui/index.dart';
 import 'package:tvp_player/core/util/app_util.dart';
-import 'package:tvp_player/platforms/components/dialog/app_about_dialog.dart';
-import 'package:tvp_player/platforms/pages/cache_manager.dart';
+import 'package:tvp_player/platforms/pages/more/cache_manager.dart';
 import 'package:tvp_player/platforms/pages/dev_pages/dev_route_tile.dart';
 
-import 'share_server/server_home_page.dart';
+import '../share_server/server_home_page.dart';
+import 'app_about_dialog.dart';
 import 'version_manager.dart';
 
 class MorePage extends StatelessWidget {
@@ -17,13 +17,14 @@ class MorePage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(title: Text("More")),
-      body: TScrollableColumn(
+      body: ScrollableColumn(
         children: [
-          TMaterialThemeProviderChooser(),
+          MaterialThemeProviderChooser(),
           VersionManager(githubUrl: 'https://github.com/ThanCoder/tvp_player'),
-          CacheManagerListTile(
-            cacheDirPath: AppUtil.instance.getPlatformCachePath(),
-          ),
+          if (AppUtil.instance.platformCacheExists)
+            CacheManagerListTile(
+              cacheDirPath: AppUtil.instance.getPlatformCachePath(),
+            ),
           ListTile(
             tileColor: col.surfaceContainer,
             shape: RoundedRectangleBorder(borderRadius: .circular(15)),
@@ -37,7 +38,10 @@ class MorePage extends StatelessWidget {
             },
           ),
           DevRouteTile(),
-          AppAboutDialogListTile(appDesc: 'Video Player Application.'),
+          AppAboutDialogListTile(
+            descText: 'Video Player Application.',
+            iconAssetPath: 'assets/logo/logo1.png',
+          ),
         ],
       ),
     );

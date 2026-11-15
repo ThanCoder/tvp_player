@@ -1,9 +1,10 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:tvp_player/core/util/app_util.dart';
 
 class AppAboutDialogListTile extends StatelessWidget {
-  const new({super.key, required this.appDesc});
-  final String appDesc;
+  const new({super.key, required this.descText, required this.iconAssetPath});
+  final String descText;
+  final String iconAssetPath;
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +26,7 @@ class AppAboutDialogListTile extends StatelessWidget {
             height: 50,
             child: ClipRRect(
               borderRadius: .circular(12),
-              child: Image.asset('assets/logo/logo1.png', fit: BoxFit.cover),
+              child: Image.asset(iconAssetPath, fit: BoxFit.cover),
             ),
           ),
 
@@ -33,7 +34,8 @@ class AppAboutDialogListTile extends StatelessWidget {
 
           children: [
             const SizedBox(height: 16),
-            Text(appDesc),
+
+            Text(descText),
 
             const SizedBox(height: 16),
 

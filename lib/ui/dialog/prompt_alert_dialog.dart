@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
-import 'package:t_widgets/t_widgets.dart';
+import 'package:material_ui/material_ui.dart';
+import '../build_context_x.dart';
 
 Future<String?> showPromptAlertDialog(
   BuildContext context,
@@ -12,7 +12,6 @@ Future<String?> showPromptAlertDialog(
   Color? confirmForegroundColor,
   Color? closeColor,
   Color? closeForegroundColor,
-  int? maxLines,
   String? Function(String text)? onErrorCheck,
 }) async {
   return await showDialog<String>(
@@ -28,7 +27,6 @@ Future<String?> showPromptAlertDialog(
       closeColor: closeColor,
       closeForegroundColor: closeForegroundColor,
       onErrorCheck: onErrorCheck,
-      maxLines: maxLines,
     ),
   );
 }
@@ -45,7 +43,6 @@ class PromptAlertDialog extends StatefulWidget {
     this.closeColor,
     this.closeForegroundColor,
     this.onErrorCheck,
-    this.maxLines,
   });
 
   final String promptText;
@@ -57,7 +54,6 @@ class PromptAlertDialog extends StatefulWidget {
   final Color? confirmForegroundColor;
   final Color? closeColor;
   final Color? closeForegroundColor;
-  final int? maxLines;
   final String? Function(String text)? onErrorCheck;
 
   @override
@@ -71,7 +67,6 @@ class _PromptAlertDialogState extends State<PromptAlertDialog> {
   void initState() {
     con.text = widget.promptText;
     focusNode.requestFocus();
-    con.selectAll();
     super.initState();
     if (widget.onErrorCheck != null) {
       onChanged(con.text);
@@ -85,11 +80,8 @@ class _PromptAlertDialogState extends State<PromptAlertDialog> {
     super.dispose();
   }
 
-  ColorScheme get col => Theme.of(context).colorScheme;
-  String? errorText;
-
-  void onChanged(String value) {
-    final res = widget.onErrorCheck?.call(value);
+  void onChanged(String val) {
+    final res = widget.onErrorCheck?.call(val);
     if (res != null) {
       errorText = res;
       setState(() {});
@@ -101,6 +93,9 @@ class _PromptAlertDialogState extends State<PromptAlertDialog> {
       });
     }
   }
+
+  ColorScheme get col => Theme.of(context).colorScheme;
+  String? errorText;
 
   @override
   Widget build(BuildContext context) {
@@ -144,7 +139,6 @@ class _PromptAlertDialogState extends State<PromptAlertDialog> {
     return TextField(
       controller: con,
       focusNode: focusNode,
-      maxLines: widget.maxLines,
       decoration: InputDecoration(
         border: OutlineInputBorder(),
         errorText: errorText,
@@ -152,7 +146,7 @@ class _PromptAlertDialogState extends State<PromptAlertDialog> {
       onChanged: onChanged,
       onSubmitted: (value) {
         if (errorText != null) return;
-        Navigator.pop<String>(context, con.text);
+        Navigator.pop<String>(context, con.text.trim());
       },
     );
   }

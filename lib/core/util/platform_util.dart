@@ -129,18 +129,20 @@ class PlatformUtil {
     return files;
   }
 
-  static Future<void> genThumbnail(
-    VFile file,
-    File saveFile, {
-    Duration position = const Duration(seconds: 15),
-  }) async {
+  static Future<void> genThumbnail(VFile file, File saveFile) async {
+    Duration position = const Duration(seconds: videoThumbnailGenDurationSec);
+
     if (await saveFile.exists()) return;
+    
     if (Platform.isAndroid) {
       await ThanPkgAndroid.getInstance.videoHandler.saveThumbnail(
         file.path,
         saveFile.path,
+        time: position,
       );
     }
+    if (saveFile.existsSync()) return;
+
     if (MediatagBin.instance.isSupported) {
       // print('savePath: $savePath');
       // return;
@@ -148,6 +150,7 @@ class PlatformUtil {
       await MediatagBin.instance.ffmpeg.video.genThumbnail(
         file.path,
         saveFile.path,
+        duration: position,
       );
     }
   }

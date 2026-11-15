@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:dart_core_extensions/dart_core_extensions.dart';
-import 'package:flutter/material.dart';
-import 'package:t_widgets/t_widgets.dart';
+import 'package:material_ui/material_ui.dart';
+import 'package:tvp_player/ui/index.dart';
 import 'package:tvp_player/core/util/app_util.dart';
 import 'package:tvp_player/keys.dart';
 import 'package:tvp_player/platforms/desktop/desktop_home_screen.dart';
@@ -36,7 +36,7 @@ class _PlatformAppState extends State<PlatformApp> {
     return StreamBuilder(
       stream: config.stream.put.where((e) => e.key == appThemeKey),
       builder: (context, asyncSnapshot) {
-        return TMaterialThemeProvider(
+        return MaterialThemeProvider(
           getTheme: () => .fromName(config.getString(appThemeKey)),
           onChanged: (type) {
             config.putAndWriteAll(appThemeKey, type.name);

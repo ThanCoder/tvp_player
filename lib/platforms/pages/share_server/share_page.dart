@@ -1,10 +1,10 @@
 import 'dart:io';
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:than_pkg_android/than_pkg_android.dart';
 import 'package:tvp_player/core/util/platform_util.dart';
-import 'package:tvp_player/platforms/components/dialog/error_alert_dialog.dart';
 import 'package:tvp_player/platforms/pages/share_server/share_controller.dart';
+import 'package:tvp_player/ui/dialog/error_alert_dialog.dart';
 
 class SharePage extends StatefulWidget {
   const new({super.key});

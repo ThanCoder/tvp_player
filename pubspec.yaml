@@ -7,10 +7,13 @@ repository: https://github.com/ThanCoder/tvp_player.git
 version: 0.1.0
 
 environment:
-  sdk: ^3.13.0
+  sdk: ^3.14.0
+
 dependencies:
   flutter:
     sdk: flutter
+  material_ui: ^1.11.0
+
   cupertino_icons: ^2.0.0
   media_kit: ^1.2.6
   video_player_media_kit: ^2.0.0
@@ -18,16 +21,15 @@ dependencies:
   video_player: ^2.14.0
   package_info_plus: ^10.2.1
   path_provider: ^2.1.6
-  dart_core_extensions: ^0.7.0
-  than_pkg_android: ^0.7.0
-  than_pkg_linux: ^0.2.0
+  dart_core_extensions: ^0.9.0
+  than_pkg_android: ^0.9.0
+  than_pkg_linux: ^0.3.0
   cfb_store: ^0.8.0
   audio_session: ^0.2.4
   media_kit_video: ^2.0.1
   uuid: ^4.6.0
   url_launcher: ^6.3.3
-  t_widgets:
-    git: https://github.com/ThanCoder/t_widgets.git
+
   t_client:
     git: https://github.com/ThanCoder/t_client
   t_server:
