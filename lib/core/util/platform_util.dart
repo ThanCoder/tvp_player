@@ -8,6 +8,7 @@ import 'package:than_pkg_android/than_pkg_android.dart';
 import 'package:than_pkg_linux/than_pkg_linux.dart';
 import 'package:tvp_player/core/models/v_file.dart';
 import 'package:tvp_player/core/util/app_util.dart';
+import 'package:tvp_player/core/util/utils.dart';
 import 'package:tvp_player/keys.dart';
 import 'package:uuid/v4.dart';
 
@@ -91,7 +92,7 @@ class PlatformUtil {
 
               files.add(
                 .new(
-                  id: UuidV4().generate(),
+                  id: generateIdFromFilePath(f.path),
                   name: f.name,
                   size: f.size,
                   path: f.path,

@@ -36,6 +36,8 @@ dependencies:
     git: https://github.com/ThanCoder/t_server.git
   mediatag_bin:
     git: https://github.com/ThanCoder/mediatag_bin.git
+  desktop_drop: ^0.9.2
+  crypto: ^3.0.8
 
 dev_dependencies:
   flutter_test:

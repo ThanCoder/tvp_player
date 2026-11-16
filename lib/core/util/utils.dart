@@ -1,24 +1,41 @@
-// int naturalCompare(String a, String b) {
-//   final regex = RegExp(r'\d+|\D+');
+import 'dart:convert';
+import 'dart:io';
 
-//   final aParts = regex.allMatches(a).map((e) => e.group(0)!).toList();
-//   final bParts = regex.allMatches(b).map((e) => e.group(0)!).toList();
+import 'package:crypto/crypto.dart';
 
-//   final length = aParts.length < bParts.length ? aParts.length : bParts.length;
+String generateIdFromFilePath(String filePath) {
+  final file = File(filePath);
 
-//   for (var i = 0; i < length; i++) {
-//     final x = aParts[i];
-//     final y = bParts[i];
+  if (!file.existsSync()) {
+    return sha1.convert(utf8.encode(filePath)).toString();
+  }
 
-//     final xNum = int.tryParse(x);
-//     final yNum = int.tryParse(y);
+  final size = file.lengthSync();
+  const readLen = 6;
 
-//     final result = xNum != null && yNum != null
-//         ? xNum.compareTo(yNum)
-//         : x.compareTo(y);
+  if (size <= readLen) {
+    return sha1.convert(file.readAsBytesSync()).toString();
+  }
 
-//     if (result != 0) return result;
-//   }
+  final fp = file.openSync(mode: FileMode.read);
 
-//   return aParts.length.compareTo(bParts.length);
-// }
+  try {
+    final data = <int>[];
+
+    // First 2 bytes
+    fp.setPositionSync(0);
+    data.addAll(fp.readSync(2));
+
+    // Middle 2 bytes
+    fp.setPositionSync((size ~/ 2) - 1);
+    data.addAll(fp.readSync(2));
+
+    // Last 2 bytes
+    fp.setPositionSync(size - 2);
+    data.addAll(fp.readSync(2));
+
+    return sha1.convert(data).toString();
+  } finally {
+    fp.closeSync();
+  }
+}

@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:dart_core_extensions/dart_core_extensions.dart';
 import 'package:dart_core_extensions/utils.dart';
+import 'package:tvp_player/core/util/utils.dart';
 
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 class VFile {
@@ -21,6 +24,19 @@ class VFile {
   final DateTime dateAdded;
   final DateTime dateModified;
   final bool thumbnailExists;
+
+  static VFile createFile(File f) {
+    return .new(
+      id: generateIdFromFilePath(f.path),
+      name: f.name,
+      size: f.size,
+      path: f.path,
+      duration: .zero,
+      dateAdded: f.accessedDate,
+      dateModified: f.modified,
+      thumbnailExists: false,
+    );
+  }
 
   VFile copyWith({
     String? id,
@@ -73,7 +89,7 @@ class VFile {
   }
 }
 
-extension VFileX on List<VFile> {
+extension VFileListX on List<VFile> {
   void sortData({bool newest = true}) {
     sort((a, b) {
       if (newest) {

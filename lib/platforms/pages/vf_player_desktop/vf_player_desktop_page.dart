@@ -25,6 +25,7 @@ class _VfPlayerDesktopPageState extends State<VfPlayerDesktopPage> {
   final Player player = .new();
   late final VideoController controller = .new(player);
   final config = AppUtil.instance.config;
+  final keyFocusNode = FocusNode();
 
   Future<void> init() async {
     final lastPos = config.getInt('$tvPlayerLastPosKey-${widget.file.id}');
@@ -60,6 +61,16 @@ class _VfPlayerDesktopPageState extends State<VfPlayerDesktopPage> {
     context.pop();
   }
 
+  void volumeUp() {
+    if (player.state.volume == 200) return;
+    player.setVolume(player.state.volume + 10);
+  }
+
+  void volumeDown() {
+    if (player.state.volume == 0) return;
+    player.setVolume(player.state.volume - 10);
+  }
+
   @override
   Widget build(BuildContext context) {
     return PopScope(
@@ -69,12 +80,27 @@ class _VfPlayerDesktopPageState extends State<VfPlayerDesktopPage> {
       },
       child: Scaffold(
         appBar: AppBar(
+          title: Text(
+            widget.file.name,
+            style: TextStyle(fontSize: 13, fontWeight: .w700),
+          ),
           leading: IconButton(
             onPressed: existsPlayer,
             icon: Icon(Icons.arrow_back_ios_new_outlined),
           ),
         ),
-        body: Video(controller: controller),
+        body: KeyboardListener(
+          focusNode: keyFocusNode,
+          onKeyEvent: (value) {
+            if (value.physicalKey == .arrowUp) {
+              volumeUp();
+            }
+            if (value.physicalKey == .arrowDown) {
+              volumeDown();
+            }
+          },
+          child: Video(controller: controller),
+        ),
       ),
     );
   }

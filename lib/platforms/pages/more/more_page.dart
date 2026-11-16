@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:material_ui/material_ui.dart';
+import 'package:tvp_player/platforms/pages/more/create_linux_desktop_icon.dart';
 import 'package:tvp_player/ui/index.dart';
 import 'package:tvp_player/core/util/app_util.dart';
 import 'package:tvp_player/platforms/pages/more/cache_manager.dart';
@@ -37,6 +40,7 @@ class MorePage extends StatelessWidget {
               );
             },
           ),
+          if (Platform.isLinux) CreateLinuxDesktopIcon(),
           DevRouteTile(),
           AppAboutDialogListTile(
             descText: 'Video Player Application.',
