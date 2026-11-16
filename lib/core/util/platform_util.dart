@@ -10,7 +10,6 @@ import 'package:tvp_player/core/models/v_file.dart';
 import 'package:tvp_player/core/util/app_util.dart';
 import 'package:tvp_player/core/util/utils.dart';
 import 'package:tvp_player/keys.dart';
-import 'package:uuid/v4.dart';
 
 class PlatformUtil {
   static Future<void> launchUrl(String url) async {
@@ -161,7 +160,7 @@ class PlatformUtil {
         duration: position,
       );
       if (res.isErr) {
-        print('gen error: ${file.name} \nmsg: ${res.unwrapError()}');
+        debugPrint('gen error: ${file.name} \nmsg: ${res.unwrapError()}');
       }
     }
   }
