@@ -12,6 +12,15 @@ class VFileMenu extends StatefulWidget {
 
   @override
   State<VFileMenu> createState() => _VFileMenuState();
+
+  static Future<void> show(BuildContext context, VFile file) async {
+    showModalBottomSheet(
+      context: context,
+      showDragHandle: true,
+      isScrollControlled: true,
+      builder: (context) => VFileMenu(file: file),
+    );
+  }
 }
 
 class _VFileMenuState extends State<VFileMenu> {

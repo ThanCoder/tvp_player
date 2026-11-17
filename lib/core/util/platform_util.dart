@@ -12,7 +12,18 @@ import 'package:tvp_player/core/util/utils.dart';
 import 'package:tvp_player/keys.dart';
 
 class PlatformUtil {
-  static Future<void> launchUrl(String url) async {
+  static final PlatformUtil instance = PlatformUtil._();
+  PlatformUtil._();
+  factory PlatformUtil() => instance;
+
+  final _pkg = ThanPkgAndroid.getInstance;
+
+  ///Value Range -> 0.0 - 1.0
+  Future<void> setVolume(double volume) async {
+    await _pkg.soundHandler.setVolume(volume);
+  }
+
+  Future<void> launchUrl(String url) async {
     if (Platform.isLinux) {
       await ThanPkgLinux.getInstance.launcher.launchUrl(url);
       return;
@@ -23,7 +34,7 @@ class PlatformUtil {
     }
   }
 
-  static Future<String> getOutPath(String name) async {
+  Future<String> getOutPath(String name) async {
     if (Platform.isLinux) {
       final p = await ThanPkgLinux.getInstance.pathHandler
           .getDownloadsDirectory();
@@ -38,14 +49,14 @@ class PlatformUtil {
     throw UnsupportedError('Only Supported -> `android`,`linux`');
   }
 
-  static String getRootDir() {
+  String getRootDir() {
     if (Platform.isLinux) {
       return Platform.environment['HOME'] ?? '';
     }
     return ThanPkgAndroid.getInstance.pathHandler.getDeviceStoragePath();
   }
 
-  static Future<bool> reqStoragePermission() async {
+  Future<bool> reqStoragePermission() async {
     if (Platform.isAndroid) {
       final pkg = ThanPkgAndroid.getInstance.storagePermissionHandler;
       if (!await pkg.isStoragePermissionGranted()) {
@@ -56,7 +67,7 @@ class PlatformUtil {
     return true;
   }
 
-  static Future<List<VFile>> scanVideoFiles() async {
+  Future<List<VFile>> scanVideoFiles() async {
     final List<VFile> files = [];
     if (Platform.isLinux || Platform.isWindows) {
       final pkg = MediatagBin.instance;
@@ -130,7 +141,7 @@ class PlatformUtil {
     return files;
   }
 
-  static Future<void> genThumbnail(VFile file, File saveFile) async {
+  Future<void> genThumbnail(VFile file, File saveFile) async {
     Duration position = Duration(
       seconds: AppUtil.instance.config.getInt(
         videoThumbnailGenDurationSecKey,
@@ -140,11 +151,15 @@ class PlatformUtil {
     if (await saveFile.exists()) return;
 
     if (Platform.isAndroid) {
-      await ThanPkgAndroid.getInstance.videoHandler.saveThumbnail(
-        file.path,
-        saveFile.path,
-        time: position,
-      );
+      try {
+        await ThanPkgAndroid.getInstance.videoHandler.saveThumbnail(
+          file.path,
+          saveFile.path,
+          time: position,
+        );
+      } catch (e) {
+        debugPrint('gen error: ${file.name} \nmsg: $e');
+      }
     }
     // print('${file.name} - dur: ${file.duration} - ${saveFile.existsSync()}');
 

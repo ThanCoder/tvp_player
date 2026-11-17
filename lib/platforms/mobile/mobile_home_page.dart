@@ -32,7 +32,7 @@ class _MobileHomePageState extends State<MobileHomePage> {
 
   Future<void> init() async {
     try {
-      final res = await PlatformUtil.reqStoragePermission();
+      final res = await PlatformUtil.instance.reqStoragePermission();
       if (!res) {
         return;
       }

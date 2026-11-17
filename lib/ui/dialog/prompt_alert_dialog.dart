@@ -1,35 +1,6 @@
 import 'package:material_ui/material_ui.dart';
-import '../build_context_x.dart';
 
-Future<String?> showPromptAlertDialog(
-  BuildContext context,
-  String promptText, {
-  bool barrierDismissible = true,
-  String? confirmText,
-  String? closeText,
-  String? title,
-  Color? confirmColor,
-  Color? confirmForegroundColor,
-  Color? closeColor,
-  Color? closeForegroundColor,
-  String? Function(String text)? onErrorCheck,
-}) async {
-  return await showDialog<String>(
-    context: context,
-    barrierDismissible: barrierDismissible,
-    builder: (context) => PromptAlertDialog(
-      promptText: promptText,
-      title: title,
-      closeText: closeText,
-      confirmText: confirmText,
-      confirmColor: confirmColor,
-      confirmForegroundColor: confirmForegroundColor,
-      closeColor: closeColor,
-      closeForegroundColor: closeForegroundColor,
-      onErrorCheck: onErrorCheck,
-    ),
-  );
-}
+import '../build_context_x.dart';
 
 class PromptAlertDialog extends StatefulWidget {
   const PromptAlertDialog({
@@ -43,6 +14,7 @@ class PromptAlertDialog extends StatefulWidget {
     this.closeColor,
     this.closeForegroundColor,
     this.onErrorCheck,
+    this.maxLines,
   });
 
   final String promptText;
@@ -54,10 +26,43 @@ class PromptAlertDialog extends StatefulWidget {
   final Color? confirmForegroundColor;
   final Color? closeColor;
   final Color? closeForegroundColor;
+  final int? maxLines;
   final String? Function(String text)? onErrorCheck;
 
   @override
   State<PromptAlertDialog> createState() => _PromptAlertDialogState();
+
+  static Future<String?> show(
+    BuildContext context,
+    String promptText, {
+    bool barrierDismissible = true,
+    String? confirmText,
+    String? closeText,
+    String? title,
+    Color? confirmColor,
+    Color? confirmForegroundColor,
+    Color? closeColor,
+    Color? closeForegroundColor,
+    String? Function(String text)? onErrorCheck,
+    int? maxLines,
+  }) async {
+    return await showDialog<String>(
+      context: context,
+      barrierDismissible: barrierDismissible,
+      builder: (context) => PromptAlertDialog(
+        promptText: promptText,
+        title: title,
+        closeText: closeText,
+        confirmText: confirmText,
+        confirmColor: confirmColor,
+        confirmForegroundColor: confirmForegroundColor,
+        closeColor: closeColor,
+        closeForegroundColor: closeForegroundColor,
+        onErrorCheck: onErrorCheck,
+        maxLines: maxLines,
+      ),
+    );
+  }
 }
 
 class _PromptAlertDialogState extends State<PromptAlertDialog> {
@@ -66,6 +71,7 @@ class _PromptAlertDialogState extends State<PromptAlertDialog> {
   @override
   void initState() {
     con.text = widget.promptText;
+    con.selection = .new(baseOffset: 0, extentOffset: con.text.length);
     focusNode.requestFocus();
     super.initState();
     if (widget.onErrorCheck != null) {
@@ -139,6 +145,7 @@ class _PromptAlertDialogState extends State<PromptAlertDialog> {
     return TextField(
       controller: con,
       focusNode: focusNode,
+      maxLines: widget.maxLines,
       decoration: InputDecoration(
         border: OutlineInputBorder(),
         errorText: errorText,

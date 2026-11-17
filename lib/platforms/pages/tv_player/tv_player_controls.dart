@@ -198,29 +198,29 @@ class TvPlayerControls extends StatelessWidget {
 
                             const Spacer(),
 
-                            IconButton(
-                              onPressed: () {},
-                              icon: const Icon(
-                                Icons.speed,
-                                color: Colors.white,
-                              ),
-                            ),
+                            // IconButton(
+                            //   onPressed: () {},
+                            //   icon: const Icon(
+                            //     Icons.speed,
+                            //     color: Colors.white,
+                            //   ),
+                            // ),
 
-                            IconButton(
-                              onPressed: () {},
-                              icon: const Icon(
-                                Icons.subtitles_outlined,
-                                color: Colors.white,
-                              ),
-                            ),
+                            // IconButton(
+                            //   onPressed: () {},
+                            //   icon: const Icon(
+                            //     Icons.subtitles_outlined,
+                            //     color: Colors.white,
+                            //   ),
+                            // ),
 
-                            IconButton(
-                              onPressed: () {},
-                              icon: const Icon(
-                                Icons.fullscreen,
-                                color: Colors.white,
-                              ),
-                            ),
+                            // IconButton(
+                            //   onPressed: () {},
+                            //   icon: const Icon(
+                            //     Icons.fullscreen,
+                            //     color: Colors.white,
+                            //   ),
+                            // ),
                           ],
                         );
                       },

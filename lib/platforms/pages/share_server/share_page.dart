@@ -143,7 +143,7 @@ class _SharePageState extends State<SharePage> {
               InkWell(
                 borderRadius: BorderRadius.circular(12),
                 onTap: () {
-                  PlatformUtil.launchUrl(url);
+                  PlatformUtil.instance.launchUrl(url);
                 },
                 child: Container(
                   padding: const EdgeInsets.symmetric(

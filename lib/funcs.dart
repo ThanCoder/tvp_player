@@ -30,15 +30,30 @@ Future<void> showVFileInfo(BuildContext context, VFile file) async {
 }
 
 Future<void> showVFileRename(BuildContext context, VFile file) async {
+  final parentPath = file.path.pathBuf.parentPath;
   final ext = file.name.extension;
-  final name = await showPromptAlertDialog(
+  final name = await PromptAlertDialog.show(
     context,
     file.name.onlyName,
     barrierDismissible: false,
-    // maxLines: null,
+    maxLines: null,
+    title: 'File Rename',
     confirmText: 'Rename',
+    onErrorCheck: (text) {
+      if (text.isEmpty) {
+        return 'Required!...';
+      }
+      if (file.name.onlyName == text) {
+        return null;
+      }
+
+      if (File(parentPath.join('$text.$ext')).existsSync()) {
+        return 'Already Exists -> `$text.$ext`';
+      }
+      return null;
+    },
   );
-  if (name == null) return;
+  if (name == null || name == file.name.onlyName) return;
   final newName = '$name.$ext';
   final con = ControllerManager.read<VFileController>();
   await con.rename(file, newName);
@@ -48,7 +63,7 @@ Future<void> showVFileRename(BuildContext context, VFile file) async {
 Future<bool> showVFilesMoveDir(BuildContext context, List<String> paths) async {
   final movePath = await context.pushMaterialPageRoute<String>(
     builder: (mainCtx) =>
-        FileExp(rootDir: Directory(PlatformUtil.getRootDir())),
+        FileExp(rootDir: Directory(PlatformUtil.instance.getRootDir())),
   );
   if (movePath == null) return false;
   final con = ControllerManager.read<VFileController>();

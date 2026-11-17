@@ -107,7 +107,7 @@ class _ReceivePageState extends State<ReceivePage> {
     if (downloadF == null) return;
     if (!mounted) return;
 
-    final outPath = await PlatformUtil.getOutPath(file.name);
+    final outPath = await PlatformUtil.instance.getOutPath(file.name);
     if (!mounted) return;
     await showDialog(
       context: context,

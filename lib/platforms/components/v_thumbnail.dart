@@ -24,7 +24,7 @@ class VThumbnail extends StatelessWidget {
     }
     // print('gen: ${file.name}');
     return FutureBuilder(
-      future: PlatformUtil.genThumbnail(file, cacheFile),
+      future: PlatformUtil.instance.genThumbnail(file, cacheFile),
       builder: (context, snapshot) {
         if (snapshot.connectionState == .waiting) {
           return Center(child: CircularProgressIndicator.adaptive());

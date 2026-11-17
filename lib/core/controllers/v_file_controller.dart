@@ -52,7 +52,7 @@ class VFileController extends IController {
     try {
       loading = true;
       addEvent(Loading());
-      files = await PlatformUtil.scanVideoFiles();
+      files = await PlatformUtil.instance.scanVideoFiles();
       sort();
 
       _loadGroups();

@@ -11,6 +11,7 @@ import 'package:than_pkg_android/than_pkg_android.dart';
 
 import 'package:tvp_player/core/models/v_file.dart';
 import 'package:tvp_player/core/util/app_util.dart';
+import 'package:tvp_player/core/util/platform_util.dart';
 import 'package:tvp_player/keys.dart';
 import 'package:tvp_player/platforms/pages/tv_player/tv_gesture_indicator.dart';
 import 'package:tvp_player/platforms/pages/tv_player/tv_player_controls.dart';
@@ -40,6 +41,12 @@ class _TvPlayerPageState extends State<TvPlayerPage> {
 
   double _gestureStartValue = 0;
   double _gestureValue = 0;
+  double _systemSoundVolume = 0;
+  // seek
+  Duration _seekStartPosition = Duration.zero;
+  Duration _seekPreviewPosition = Duration.zero;
+  double _seekDragDistance = 0;
+  final double _seekDistanceSec = 0.5;
 
   // ignore: unused_field
   Offset? _gestureStartPosition;
@@ -51,6 +58,10 @@ class _TvPlayerPageState extends State<TvPlayerPage> {
   void initState() {
     if (Platform.isAndroid) {
       ThanPkgAndroid.getInstance.flutterUtils.toggleFullscreen(true);
+      ThanPkgAndroid.getInstance.soundHandler.getVolume().then((val) {
+        if (val == null) return;
+        _systemSoundVolume = val * 100;
+      });
     }
 
     super.initState();
@@ -153,16 +164,6 @@ class _TvPlayerPageState extends State<TvPlayerPage> {
     }
   }
 
-  // ---------------------------------------------------------------------------
-  // Landscape / Immersive
-  // ---------------------------------------------------------------------------
-
-  // Future<void> _enterLandscape() async {
-  //   await ThanPkgAndroid.getInstance.orientationHandler.setOrientation(
-  //     .SCREEN_ORIENTATION_SENSOR_LANDSCAPE,
-  //   );
-  // }
-
   Future<void> _exitLandscape() async {
     if (Platform.isAndroid) {
       await ThanPkgAndroid.getInstance.orientationHandler.setOrientation(
@@ -262,14 +263,52 @@ class _TvPlayerPageState extends State<TvPlayerPage> {
       _gestureValue = _gestureStartValue;
     } else if (x > width * .60) {
       _gestureType = GestureType.volume;
-
-      _gestureStartValue = player.state.volume;
+      _gestureStartValue = _systemSoundVolume;
       _gestureValue = _gestureStartValue;
     } else {
       _gestureType = null;
       return;
     }
 
+    _showGesture();
+  }
+
+  void _onHorizontalDragStart(DragStartDetails details) {
+    _gestureType = GestureType.seek;
+
+    _seekStartPosition = player.state.position;
+    _seekPreviewPosition = _seekStartPosition;
+
+    _seekDragDistance = 0;
+
+    _showGesture();
+  }
+
+  void _onHorizontalDragUpdate(DragUpdateDetails details) {
+    if (_gestureType != GestureType.seek) return;
+
+    _seekDragDistance += details.delta.dx;
+
+    // 100 pixels = 10 seconds
+    final seekSeconds = _seekDragDistance * _seekDistanceSec;
+
+    final duration = player.state.duration;
+
+    final nextMs =
+        (_seekStartPosition.inMilliseconds + (seekSeconds * 1000).round())
+            .clamp(0, duration.inMilliseconds);
+
+    _seekPreviewPosition = Duration(milliseconds: nextMs);
+
+    _showGesture();
+  }
+
+  Future<void> _onHorizontalDragEnd(DragEndDetails details) async {
+    if (_gestureType != GestureType.seek) return;
+
+    await player.seek(_seekPreviewPosition);
+
+    _gestureType = null;
     _showGesture();
   }
 
@@ -355,15 +394,17 @@ class _TvPlayerPageState extends State<TvPlayerPage> {
   // ===========================================================================
 
   void _updateVolume(double delta) {
-    // media_kit volume = 0.0 ~ 100.0
-
-    final current = _gestureValue;
-
-    final next = (current + (delta * 100)).clamp(0.0, 200.0);
+    final next = (_gestureValue + (delta * 100)).clamp(0.0, 200.0);
 
     _gestureValue = next;
+    _systemSoundVolume = next;
 
-    player.setVolume(next);
+    if (next <= 100) {
+      PlatformUtil.instance.setVolume(next / 100);
+    } else {
+      PlatformUtil.instance.setVolume(1.0);
+      player.setVolume(next);
+    }
 
     _showGesture();
   }
@@ -421,10 +462,12 @@ class _TvPlayerPageState extends State<TvPlayerPage> {
               },
 
               onVerticalDragStart: _onVerticalDragStart,
-
               onVerticalDragUpdate: _onVerticalDragUpdate,
-
               onVerticalDragEnd: _onVerticalDragEnd,
+
+              onHorizontalDragStart: _onHorizontalDragStart,
+              onHorizontalDragUpdate: _onHorizontalDragUpdate,
+              onHorizontalDragEnd: _onHorizontalDragEnd,
 
               child: const SizedBox.expand(),
             ),
@@ -437,6 +480,9 @@ class _TvPlayerPageState extends State<TvPlayerPage> {
                 child: TvGestureIndicator(
                   type: _gestureType,
                   value: _gestureValue,
+                  position: _seekPreviewPosition,
+                  duration: player.state.duration,
+                  isForward: _seekDragDistance >= 0,
                 ),
               ),
 

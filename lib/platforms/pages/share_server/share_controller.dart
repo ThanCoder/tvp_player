@@ -54,7 +54,7 @@ class ShareController {
         AppUtil.instance.getPlatformCachePath('${item.name.onlyName}.jpg'),
       );
       if (!coverFile.existsSync()) {
-        await PlatformUtil.genThumbnail(item, coverFile);
+        await PlatformUtil.instance.genThumbnail(item, coverFile);
       }
       if (!coverFile.existsSync()) {
         if (_logoBytes == null) {
